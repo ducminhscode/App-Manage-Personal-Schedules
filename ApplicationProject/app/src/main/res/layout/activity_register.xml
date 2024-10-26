@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Sign Up"
+        android:text="@string/sign_up"
         android:textColor="#000000"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -89,7 +89,7 @@
             android:layout_marginEnd="0dp"
             android:layout_toEndOf="@+id/emailEmailIcon"
             android:background="@android:color/transparent"
-            android:hint="Email"
+            android:hint="Email Address"
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:paddingStart="10dp"
@@ -126,7 +126,7 @@
             android:layout_marginEnd="0dp"
             android:layout_toEndOf="@+id/mobileNumberPhoneIcon"
             android:background="@android:color/transparent"
-            android:hint="Mobile number"
+            android:hint="Mobile Number"
             android:inputType="phone"
             android:maxLines="1"
             android:paddingStart="10dp"
@@ -212,7 +212,7 @@
             android:layout_toStartOf="@+id/confirmPasswordShowIcon"
             android:layout_toEndOf="@+id/confirmPasswordLockIcon"
             android:background="@android:color/transparent"
-            android:hint="Confirm password"
+            android:hint="Confirm Password"
             android:inputType="textPassword"
             android:maxLines="1"
             android:paddingStart="10dp"
@@ -282,7 +282,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/round_back_primary_15"
-        android:text="Sign Up"
+        android:text="@string/sign_up"
         android:textAllCaps="false"
         android:textColor="#FFFFFF" />
 
@@ -304,7 +304,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:text="Sign In"
+            android:text="@string/sign_in"
             android:textColor="@color/primary"
             android:textStyle="bold" />
     </LinearLayout>

@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Sign In"
+        android:text="@string/sign_in"
         android:textColor="#000000"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -149,7 +149,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/round_back_primary_15"
-        android:text="Sign In"
+        android:text="@string/sign_in"
         android:textAllCaps="false"
         android:textColor="#FFFFFF" />
 
@@ -235,7 +235,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:text="Sign Up"
+            android:text="@string/sign_up"
             android:textColor="@color/primary"
             android:textStyle="bold" />
     </LinearLayout>
