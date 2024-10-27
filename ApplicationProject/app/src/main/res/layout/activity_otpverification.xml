@@ -9,12 +9,19 @@
     tools:context=".OTPVerification">
 
     <ImageView
+        android:id="@+id/backToRegister"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/back"/>
+
+    <ImageView
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
-        android:src="@drawable/otp"
-        android:layout_marginTop="40dp"/>
+        android:src="@drawable/otp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -22,7 +29,7 @@
         android:gravity="center"
         android:text="Please enter your code that we have sent to you"
         android:textColor="#66000000"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"/>
 
@@ -71,7 +78,7 @@
         android:weightSum="4"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:gravity="center">
 
         <EditText
@@ -165,7 +172,7 @@
         android:layout_height="55dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/round_back_primary_15"
         android:text="Verify"
         android:textAllCaps="false"
@@ -185,7 +192,7 @@
             android:text="Didn't receive OTP?" />
 
         <TextView
-            android:id="@+id/signUpBtn"
+            android:id="@+id/resendBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"

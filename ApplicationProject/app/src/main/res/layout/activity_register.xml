@@ -244,7 +244,6 @@
             android:layout_height="wrap_content"
             android:button="@drawable/custom_checkbox"
             android:buttonTint="@color/primary"
-            android:checked="false"
             android:text=" I agree to our"
             app:buttonTint="@null" />
 
@@ -275,7 +274,7 @@
 
     <!--Đăng ký tài khoản-->
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/SignUpBtn"
+        android:id="@+id/signUpBtnRegister"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_marginStart="20dp"
@@ -300,7 +299,7 @@
             android:text="Already have an account?" />
 
         <TextView
-            android:id="@+id/signInBtn"
+            android:id="@+id/signInBtnRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"

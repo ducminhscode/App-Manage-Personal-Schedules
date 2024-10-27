@@ -142,7 +142,7 @@
     <!--Đăng nhập tài khoản-->
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/signInBtn"
+        android:id="@+id/signInBtnLogin"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_marginStart="20dp"
@@ -231,7 +231,7 @@
             android:text="Don't have an account?" />
 
         <TextView
-            android:id="@+id/signUpBtn"
+            android:id="@+id/signUpBtnLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
