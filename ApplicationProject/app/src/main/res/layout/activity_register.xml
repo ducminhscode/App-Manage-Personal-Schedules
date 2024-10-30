@@ -54,7 +54,7 @@
             android:layout_toEndOf="@+id/usernameUserIcon"
             android:background="@android:color/transparent"
             android:hint="Username"
-            android:inputType="text"
+            android:inputType="textPersonName"
             android:maxLines="1"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"

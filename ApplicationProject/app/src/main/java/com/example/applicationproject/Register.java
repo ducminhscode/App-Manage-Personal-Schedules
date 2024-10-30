@@ -18,6 +18,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.applicationproject.Database.CreateDatabase;
+
 public class Register extends AppCompatActivity {
 
     private boolean passwordShowing = false;
@@ -34,6 +36,7 @@ public class Register extends AppCompatActivity {
             return insets;
         });
 
+        final EditText name = findViewById(R.id.userNameET);
         final EditText email = findViewById(R.id.emailET);
         final EditText mobile = findViewById(R.id.mobileET);
         final EditText password = findViewById(R.id.passwordET);
@@ -99,7 +102,12 @@ public class Register extends AppCompatActivity {
         signUpBtnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkLegitBtn.isChecked()) {
+                if (checkLegitBtn.isChecked()) {
+
+                    /*CreateDatabase credb = new CreateDatabase(Register.this);
+                    credb.addUser(name.getText().toString().trim(), email.getText().toString().trim(),
+                            mobile.getText().toString().trim(), password.getText().toString().trim());*/
+
                     final String getMobileTxt = mobile.getText().toString();
                     final String getEmailTxt = email.getText().toString();
 
@@ -109,8 +117,7 @@ public class Register extends AppCompatActivity {
                     intent.putExtra("email", getEmailTxt);
 
                     startActivity(intent);
-                }
-                else{
+                } else {
                     Toast.makeText(Register.this, "You must agree to our terms and conditions", Toast.LENGTH_SHORT).show();
                 }
             }

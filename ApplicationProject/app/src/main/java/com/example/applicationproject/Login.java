@@ -6,6 +6,7 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -33,6 +34,7 @@ public class Login extends AppCompatActivity {
         final EditText passwordET = findViewById(R.id.passwordET);
         final ImageView passwordShowIcon = findViewById(R.id.passwordShowIcon);
         final TextView signUpBtnLogin = findViewById(R.id.signUpBtnLogin);
+        final RelativeLayout signInWithGoogle = findViewById(R.id.signInWithGoogle);
 
         passwordShowIcon.setOnClickListener(new View.OnClickListener() {
             @Override
