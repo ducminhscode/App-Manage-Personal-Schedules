@@ -106,7 +106,7 @@
             android:layout_marginEnd="10dp"
             android:adjustViewBounds="true"
             android:padding="10dp"
-            android:src="@drawable/show" />
+            android:src="@drawable/hide" />
     </RelativeLayout>
 
     <!--Nhớ tài khoản và quên mật khẩu-->

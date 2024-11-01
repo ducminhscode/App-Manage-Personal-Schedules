@@ -4,12 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,9 +14,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.applicationproject.Database.CreateDatabase;
+import java.util.Currency;
 
-public class Register extends AppCompatActivity {
+public class ForgotPasswordChange extends AppCompatActivity {
 
     private boolean passwordShowing = false;
     private boolean confirmPasswordShowing = false;
@@ -29,27 +25,30 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_forgot_password_change);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        final EditText name = findViewById(R.id.userNameET);
-        final EditText email = findViewById(R.id.emailET);
-        final EditText mobile = findViewById(R.id.mobileET);
+        final ImageView backToForgotPasswordCheck = findViewById(R.id.backToForgotPasswordCheck);
         final EditText password = findViewById(R.id.passwordET);
         final EditText confirmPassword = findViewById(R.id.confirmPasswordET);
 
         final ImageView passwordShowIcon = findViewById(R.id.passwordShowIcon);
         final ImageView confirmPasswordShowIcon = findViewById(R.id.confirmPasswordShowIcon);
 
-        final AppCompatButton signUpBtnRegister = findViewById(R.id.signUpBtnRegister);
+        final AppCompatButton agreeBtnFW = findViewById(R.id.agreeBtnFW);
 
-        final TextView signInBtnRegister = findViewById(R.id.signInBtnRegister);
-
-        final CheckBox checkLegitBtn = findViewById(R.id.checkLegitBtn);
+        backToForgotPasswordCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ForgotPasswordChange.this, ForgotPasswordCheck.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+            }
+        });
 
         passwordShowIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,45 +87,6 @@ public class Register extends AppCompatActivity {
 
                 }
                 confirmPassword.setSelection(confirmPassword.length());
-            }
-        });
-
-        checkLegitBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                signUpBtnRegister.setEnabled(true);
-            } else {
-                signUpBtnRegister.setEnabled(false);
-            }
-        });
-
-        signUpBtnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkLegitBtn.isChecked()) {
-
-                    /*CreateDatabase credb = new CreateDatabase(Register.this);
-                    credb.addUser(name.getText().toString().trim(), email.getText().toString().trim(),
-                            mobile.getText().toString().trim(), password.getText().toString().trim());*/
-
-                    final String getMobileTxt = mobile.getText().toString();
-                    final String getEmailTxt = email.getText().toString();
-
-                    Intent intent = new Intent(Register.this, OTPVerification.class);
-
-                    intent.putExtra("mobile", getMobileTxt);
-                    intent.putExtra("email", getEmailTxt);
-
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(Register.this, "You must agree to our terms and conditions", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        signInBtnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
             }
         });
     }

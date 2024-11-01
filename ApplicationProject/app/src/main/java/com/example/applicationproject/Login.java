@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -35,6 +36,14 @@ public class Login extends AppCompatActivity {
         final ImageView passwordShowIcon = findViewById(R.id.passwordShowIcon);
         final TextView signUpBtnLogin = findViewById(R.id.signUpBtnLogin);
         final RelativeLayout signInWithGoogle = findViewById(R.id.signInWithGoogle);
+        final TextView forgotPasswordBtn = findViewById(R.id.forgotPasswordBtn);
+
+        forgotPasswordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Login.this, ForgotPasswordCheck.class));
+            }
+        });
 
         passwordShowIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,13 +52,13 @@ public class Login extends AppCompatActivity {
                 {
                     passwordShowing = false;
                     passwordET.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    passwordShowIcon.setImageResource(R.drawable.show);
+                    passwordShowIcon.setImageResource(R.drawable.hide);
                 }
                 else
                 {
                     passwordShowing = true;
                     passwordET.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    passwordShowIcon.setImageResource(R.drawable.hide);
+                    passwordShowIcon.setImageResource(R.drawable.show);
                 }
                 passwordET.setSelection(passwordET.length());
             }

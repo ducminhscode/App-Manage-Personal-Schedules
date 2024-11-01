@@ -180,7 +180,7 @@
             android:layout_marginEnd="10dp"
             android:adjustViewBounds="true"
             android:padding="10dp"
-            android:src="@drawable/show" />
+            android:src="@drawable/hide" />
     </RelativeLayout>
 
     <!--Xác nhận mật khẩu-->
@@ -228,7 +228,7 @@
             android:layout_marginEnd="10dp"
             android:adjustViewBounds="true"
             android:padding="10dp"
-            android:src="@drawable/show" />
+            android:src="@drawable/hide" />
     </RelativeLayout>
 
     <!--Điều khoản sử dụng và chính sách bảo mật-->
