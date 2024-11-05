@@ -54,6 +54,9 @@ public class Register extends AppCompatActivity {
 
         final CheckBox checkLegitBtn = findViewById(R.id.checkLegitBtn);
 
+        final TextView termsOfServiceBtn = findViewById(R.id.termsOfServiceBtn);
+        final TextView privacyPolicyBtn = findViewById(R.id.privacyPolicyBtn);
+
         db = new CreateDatabase(this);
 
         passwordShowIcon.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +104,22 @@ public class Register extends AppCompatActivity {
                 signUpBtnRegister.setEnabled(true);
             } else {
                 signUpBtnRegister.setEnabled(false);
+            }
+        });
+
+        privacyPolicyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Register.this, PrivacyPolicyAndTermsOfService.class);
+                startActivity(intent);
+            }
+        });
+
+        termsOfServiceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Register.this, PrivacyPolicyAndTermsOfService.class);
+                startActivity(intent);
             }
         });
 
