@@ -6,6 +6,7 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +15,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.util.Currency;
+import com.example.applicationproject.Database.CreateDatabase;
+
 
 public class ForgotPasswordChange extends AppCompatActivity {
 
-    private boolean passwordShowing = false;
+    private boolean currentPasswordShowing = false;
+    private boolean newPasswordShowing = false;
     private boolean confirmPasswordShowing = false;
+
+    private CreateDatabase db;
+
+    private Register valid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +40,20 @@ public class ForgotPasswordChange extends AppCompatActivity {
         });
 
         final ImageView backToForgotPasswordCheck = findViewById(R.id.backToForgotPasswordCheck);
-        final EditText password = findViewById(R.id.passwordET);
+        final EditText currentPassword = findViewById(R.id.currentPasswordET);
+        final EditText newPassword = findViewById(R.id.newPasswordET);
         final EditText confirmPassword = findViewById(R.id.confirmPasswordET);
 
-        final ImageView passwordShowIcon = findViewById(R.id.passwordShowIcon);
+        final ImageView currentPasswordShowIcon = findViewById(R.id.currentPasswordShowIcon);
+        final ImageView newPasswordShowIcon = findViewById(R.id.newPasswordShowIcon);
         final ImageView confirmPasswordShowIcon = findViewById(R.id.confirmPasswordShowIcon);
 
         final AppCompatButton agreeBtnFW = findViewById(R.id.agreeBtnFW);
+
+        final String getEmail = getIntent().getStringExtra("email");
+
+        db = new CreateDatabase(this);
+        valid = new Register();
 
         backToForgotPasswordCheck.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,23 +64,43 @@ public class ForgotPasswordChange extends AppCompatActivity {
             }
         });
 
-        passwordShowIcon.setOnClickListener(new View.OnClickListener() {
+        currentPasswordShowIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (passwordShowing) {
+                if (currentPasswordShowing) {
 
-                    passwordShowing = false;
-                    password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    passwordShowIcon.setImageResource(R.drawable.hide);
+                    currentPasswordShowing = false;
+                    currentPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    currentPasswordShowIcon.setImageResource(R.drawable.hide);
 
                 } else {
 
-                    passwordShowing = true;
-                    password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    passwordShowIcon.setImageResource(R.drawable.show);
+                    currentPasswordShowing = true;
+                    currentPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    currentPasswordShowIcon.setImageResource(R.drawable.show);
 
                 }
-                password.setSelection(password.length());
+                currentPassword.setSelection(currentPassword.length());
+            }
+        });
+
+        newPasswordShowIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (newPasswordShowing) {
+
+                    newPasswordShowing = false;
+                    newPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    newPasswordShowIcon.setImageResource(R.drawable.hide);
+
+                } else {
+
+                    newPasswordShowing = true;
+                    newPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    newPasswordShowIcon.setImageResource(R.drawable.show);
+
+                }
+                newPassword.setSelection(newPassword.length());
             }
         });
 
@@ -87,6 +121,46 @@ public class ForgotPasswordChange extends AppCompatActivity {
 
                 }
                 confirmPassword.setSelection(confirmPassword.length());
+            }
+        });
+
+        agreeBtnFW.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (currentPassword.getText().toString().isEmpty()) {
+                    currentPassword.setError("Please enter your password");
+                    currentPassword.requestFocus();
+
+                } else if (!db.checkPassword(getEmail, currentPassword.getText().toString())) {
+                    Toast.makeText(ForgotPasswordChange.this, "Password Incorrect", Toast.LENGTH_SHORT).show();
+
+                } else if (newPassword.getText().toString().isEmpty()) {
+                    newPassword.setError("Please enter your password");
+                    newPassword.requestFocus();
+
+                } else if (!valid.isPasswordValid(newPassword.getText().toString())) {
+                    newPassword.setError("Password must contain at least 8 characters, including a letter, a digit, and a special character");
+                    newPassword.requestFocus();
+
+                } else if (confirmPassword.getText().toString().isEmpty()) {
+                    confirmPassword.setError("Please enter confirm password");
+                    confirmPassword.requestFocus();
+
+                } else if (!newPassword.getText().toString().equals(confirmPassword.getText().toString())) {
+                    confirmPassword.setError("Password not match");
+                    confirmPassword.requestFocus();
+
+                } else {
+                    boolean updateSuccess = db.updatePassword(getEmail, newPassword.getText().toString());
+                    if (!updateSuccess) {
+                        Toast.makeText(ForgotPasswordChange.this, "Password not changed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ForgotPasswordChange.this, "Password changed successfully", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(ForgotPasswordChange.this, Login.class));
+                    }
+                }
+
             }
         });
     }

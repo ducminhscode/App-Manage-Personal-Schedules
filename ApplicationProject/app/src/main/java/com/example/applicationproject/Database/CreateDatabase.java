@@ -2,6 +2,7 @@ package com.example.applicationproject.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
@@ -74,6 +75,7 @@ public class CreateDatabase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    //Đăng ký người dùng
     public void addUser(String name, String email, String mobile, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -89,4 +91,81 @@ public class CreateDatabase extends SQLiteOpenHelper {
             Toast.makeText(context, "Sign Up Successfully", Toast.LENGTH_SHORT).show();
         }
     }
+
+    //Kiểm tra Login
+    public boolean checkUser(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER + " WHERE "
+                + USER_NAME + " = ? AND " + USER_PASSWORD + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[] { username, password });
+        boolean userExists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+
+        return userExists;
+    }
+
+    //Kiểm tra đổi mật khẩu
+    public boolean checkPassword(String email, String password){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER + " WHERE "
+                + USER_EMAIL + " = ? AND " + USER_PASSWORD + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[] { email, password });
+        boolean passExists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+
+        return passExists;
+    }
+
+    //Kiểm tra người dùng có tồn tại hay chưa
+    public boolean checkUsernameExists(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER + " WHERE " + USER_NAME + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{username});
+        boolean usernameExists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+
+        return usernameExists;
+    }
+
+    //Kiểm tra email có tồn tại hay chưa
+    public boolean checkEmailExists(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER + " WHERE " + USER_EMAIL + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        boolean emailExists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+
+        return emailExists;
+    }
+
+    //Kiểm tra số điện thoại có tồn tại hay chưa
+    public boolean checkExists(String mobile){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER + " WHERE " + USER_MOBILE + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{mobile});
+        boolean mobileExists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+
+        return mobileExists;
+    }
+
+    //Thay đổi mật khẩu
+    public boolean updatePassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(USER_PASSWORD, newPassword);
+
+        int rows = db.update(TABLE_USER, values, USER_EMAIL + " = ?", new String[]{email});
+        db.close();
+        return rows > 0;
+    }
+
 }

@@ -8,12 +8,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethod;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +21,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import org.w3c.dom.Text;
+
 
 public class OTPVerification extends AppCompatActivity {
 
@@ -32,6 +32,7 @@ public class OTPVerification extends AppCompatActivity {
     private int resendTime = 90;
 
     private int selectedETPosition = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +66,15 @@ public class OTPVerification extends AppCompatActivity {
         otpEmail.setText(getEmail);
         otpMobile.setText(getMobile);
 
+
         otp1.addTextChangedListener(textWatcher);
         otp2.addTextChangedListener(textWatcher);
         otp3.addTextChangedListener(textWatcher);
         otp4.addTextChangedListener(textWatcher);
         otp5.addTextChangedListener(textWatcher);
         otp6.addTextChangedListener(textWatcher);
+
+        final String generateOtp = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
 
         showKeyboard(otp1);
 
@@ -86,11 +90,10 @@ public class OTPVerification extends AppCompatActivity {
                 }
             }
         });
+
         verifyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String generateOtp = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
-
                 if (generateOtp.length() == 6) {
                     //handle your otp verification here
                 }
@@ -149,33 +152,29 @@ public class OTPVerification extends AppCompatActivity {
         @Override
         public void afterTextChanged(Editable editable) {
 
-            if(editable.length() > 0){
-                if(selectedETPosition==0){
+            if (editable.length() > 0) {
+                if (selectedETPosition == 0) {
 
-                    selectedETPosition=1;
+                    selectedETPosition = 1;
                     showKeyboard(otp2);
 
-                }
-                else if(selectedETPosition==1){
+                } else if (selectedETPosition == 1) {
 
-                    selectedETPosition=2;
+                    selectedETPosition = 2;
                     showKeyboard(otp3);
 
-                }
-                else if(selectedETPosition==2){
+                } else if (selectedETPosition == 2) {
 
-                    selectedETPosition=3;
+                    selectedETPosition = 3;
                     showKeyboard(otp4);
-                }
-                else if(selectedETPosition==3){
+                } else if (selectedETPosition == 3) {
 
-                    selectedETPosition=4;
+                    selectedETPosition = 4;
                     showKeyboard(otp5);
 
-                }
-                else if(selectedETPosition==4){
+                } else if (selectedETPosition == 4) {
 
-                    selectedETPosition=5;
+                    selectedETPosition = 5;
                     showKeyboard(otp6);
 
                 }
