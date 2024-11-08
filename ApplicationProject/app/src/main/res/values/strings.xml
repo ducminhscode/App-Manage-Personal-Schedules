@@ -2,4 +2,6 @@
     <string name="app_name">ApplicationProject</string>
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign In</string>
+    <string name="web_client_id">666234794614-k7gun4ks9k4r8vlhk7mf819en95ktujs.apps.googleusercontent.com</string>
+
 </resources>

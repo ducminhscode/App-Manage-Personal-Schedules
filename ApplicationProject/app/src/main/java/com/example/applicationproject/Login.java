@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -21,6 +22,13 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.applicationproject.Database.CreateDatabase;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+
 
 public class Login extends AppCompatActivity {
 
@@ -28,6 +36,9 @@ public class Login extends AppCompatActivity {
     private boolean remember = false;
 
     private CreateDatabase db;
+
+    protected GoogleSignInClient mGoogleSignInClient;
+    protected static final int RC_SIGN_IN = 9001;
 
 
     @Override
@@ -52,11 +63,17 @@ public class Login extends AppCompatActivity {
 
         db = new CreateDatabase(this);
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
         SharedPreferences pref = getSharedPreferences("USER_FILE", MODE_PRIVATE);
         String un = pref.getString("USERNAME", "");
         String ps = pref.getString("PASSWORD", "");
         userNameET.setText(un);
         passwordET.setText(ps);
+
 
         checkRememberBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -93,7 +110,7 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                boolean isValidUser = db.checkUser(userNameET.getText().toString(),passwordET.getText().toString());
+                boolean isValidUser = db.checkUser(userNameET.getText().toString(), passwordET.getText().toString());
 
                 if (userNameET.getText().toString().isEmpty()) {
                     userNameET.setError("Please enter your username");
@@ -101,9 +118,9 @@ public class Login extends AppCompatActivity {
                 } else if (passwordET.getText().toString().isEmpty()) {
                     passwordET.setError("Please enter your password");
                     passwordET.requestFocus();
-                } else if(!isValidUser) {
+                } else if (!isValidUser) {
                     Toast.makeText(Login.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     rememberUser(userNameET.getText().toString(), passwordET.getText().toString(), remember);
                     startActivity(new Intent(Login.this, MainActivity.class));
                 }
@@ -113,9 +130,10 @@ public class Login extends AppCompatActivity {
         signInWithGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                signInWithGG();
             }
         });
+
 
         signUpBtnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,4 +155,41 @@ public class Login extends AppCompatActivity {
         }
         editor.commit();
     }
+
+    private void signInWithGG() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+
+                String personName = account.getDisplayName();
+                String personEmail = account.getEmail();
+
+                if (!db.checkEmailExists(personEmail) || !db.checkUsernameExists(personName)) {
+
+                    CreateDatabase credb = new CreateDatabase(Login.this);
+                    credb.addUser(personName, personEmail, null, null);
+
+                }
+                Toast.makeText(Login.this, "Sign in successfully", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Login.this, MainActivity.class));
+
+            } catch (ApiException e) {
+
+                Toast.makeText(Login.this, "Sign in failed", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    }
+
 }

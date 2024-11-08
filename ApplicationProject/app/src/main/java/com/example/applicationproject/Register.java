@@ -133,7 +133,7 @@ public class Register extends AppCompatActivity {
                     boolean isValidMobile = db.checkExists(mobile.getText().toString());
 
                     if (name.getText().toString().isEmpty()) {
-                        name.setError("Please enter your name");
+                        name.setError("Please enter your username");
                         name.requestFocus();
 
                     } else if (name.getText().toString().contains(" ")) {
