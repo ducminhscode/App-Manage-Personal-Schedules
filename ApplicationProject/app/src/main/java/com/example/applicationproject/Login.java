@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -130,10 +129,10 @@ public class Login extends AppCompatActivity {
         signInWithGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 signInWithGG();
             }
         });
-
 
         signUpBtnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,8 +156,10 @@ public class Login extends AppCompatActivity {
     }
 
     private void signInWithGG() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
     }
 
 
@@ -191,5 +192,4 @@ public class Login extends AppCompatActivity {
             }
         }
     }
-
 }
