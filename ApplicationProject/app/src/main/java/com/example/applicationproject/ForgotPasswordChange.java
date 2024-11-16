@@ -20,7 +20,6 @@ import com.example.applicationproject.Database.CreateDatabase;
 
 public class ForgotPasswordChange extends AppCompatActivity {
 
-    private boolean currentPasswordShowing = false;
     private boolean newPasswordShowing = false;
     private boolean confirmPasswordShowing = false;
 
@@ -39,12 +38,14 @@ public class ForgotPasswordChange extends AppCompatActivity {
             return insets;
         });
 
+
+
         final ImageView backToForgotPasswordCheck = findViewById(R.id.backToForgotPasswordCheck);
-        final EditText currentPassword = findViewById(R.id.currentPasswordET);
+
         final EditText newPassword = findViewById(R.id.newPasswordET);
         final EditText confirmPassword = findViewById(R.id.confirmPasswordET);
 
-        final ImageView currentPasswordShowIcon = findViewById(R.id.currentPasswordShowIcon);
+
         final ImageView newPasswordShowIcon = findViewById(R.id.newPasswordShowIcon);
         final ImageView confirmPasswordShowIcon = findViewById(R.id.confirmPasswordShowIcon);
 
@@ -64,25 +65,6 @@ public class ForgotPasswordChange extends AppCompatActivity {
             }
         });
 
-        currentPasswordShowIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentPasswordShowing) {
-
-                    currentPasswordShowing = false;
-                    currentPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    currentPasswordShowIcon.setImageResource(R.drawable.hide);
-
-                } else {
-
-                    currentPasswordShowing = true;
-                    currentPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    currentPasswordShowIcon.setImageResource(R.drawable.show);
-
-                }
-                currentPassword.setSelection(currentPassword.length());
-            }
-        });
 
         newPasswordShowIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,14 +110,7 @@ public class ForgotPasswordChange extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (currentPassword.getText().toString().isEmpty()) {
-                    currentPassword.setError("Please enter your password");
-                    currentPassword.requestFocus();
-
-                } else if (!db.checkPassword(getEmail, currentPassword.getText().toString())) {
-                    Toast.makeText(ForgotPasswordChange.this, "Password Incorrect", Toast.LENGTH_SHORT).show();
-
-                } else if (newPassword.getText().toString().isEmpty()) {
+                if (newPassword.getText().toString().isEmpty()) {
                     newPassword.setError("Please enter your password");
                     newPassword.requestFocus();
 
@@ -153,11 +128,11 @@ public class ForgotPasswordChange extends AppCompatActivity {
 
                 } else {
                     boolean updateSuccess = db.updatePassword(getEmail, newPassword.getText().toString());
-                    if (!updateSuccess) {
-                        Toast.makeText(ForgotPasswordChange.this, "Password not changed", Toast.LENGTH_SHORT).show();
-                    } else {
+                    if (updateSuccess) {
                         Toast.makeText(ForgotPasswordChange.this, "Password changed successfully", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(ForgotPasswordChange.this, Login.class));
+                    } else {
+                        Toast.makeText(ForgotPasswordChange.this, "Password not changed", Toast.LENGTH_SHORT).show();
                     }
                 }
 

@@ -70,7 +70,7 @@ public class ForgotPasswordCheck extends AppCompatActivity {
 
                 final String getEmailTxt = emailAddressFW.getText().toString();
 
-                Intent intent = new Intent(ForgotPasswordCheck.this, ForgotPasswordChange.class);
+                Intent intent = new Intent(ForgotPasswordCheck.this, ForgotPasswordOTP.class);
                 intent.putExtra("email", getEmailTxt);
 
                 startActivity(intent);

@@ -28,6 +28,8 @@ public class Register extends AppCompatActivity {
 
     private CreateDatabase db;
 
+    private OTPVerification isOTP;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,21 +191,22 @@ public class Register extends AppCompatActivity {
                         confirmPassword.requestFocus();
 
                     } else {
-                        CreateDatabase credb = new CreateDatabase(Register.this);
-                        credb.addUser(name.getText().toString().trim(), email.getText().toString().trim(),
-                                mobile.getText().toString().trim(), password.getText().toString().trim());
 
-                    /*final String getMobileTxt = mobile.getText().toString();
-                    final String getEmailTxt = email.getText().toString();
+                        final String getNameTxt = name.getText().toString().trim();
+                        final String getEmailTxt = email.getText().toString().trim();
+                        final String getMobileTxt = mobile.getText().toString().trim();
+                        final String getPasswordTxt = password.getText().toString().trim();
 
-                    Intent intent = new Intent(Register.this, OTPVerification.class);
 
-                    intent.putExtra("mobile", getMobileTxt);
-                    intent.putExtra("email", getEmailTxt);
+                        Intent intent = new Intent(Register.this, OTPVerification.class);
 
-                    startActivity(intent);*/
-                        Toast.makeText(Register.this, "Register successfully", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(Register.this, Login.class));
+                        intent.putExtra("name", getNameTxt);
+                        intent.putExtra("email", getEmailTxt);
+                        intent.putExtra("mobile", getMobileTxt);
+                        intent.putExtra("password", getPasswordTxt);
+
+                        startActivity(intent);
+
                     }
                 } else {
                     Toast.makeText(Register.this, "You must agree to our terms and conditions", Toast.LENGTH_SHORT).show();

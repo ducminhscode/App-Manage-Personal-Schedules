@@ -14,12 +14,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.applicationproject.Database.CreateDatabase;
+import com.example.applicationproject.OTPCode.EmailOTP;
+
+import java.util.Random;
 
 public class ForgotPasswordOTP extends AppCompatActivity {
 
@@ -28,8 +34,17 @@ public class ForgotPasswordOTP extends AppCompatActivity {
 
     private boolean resendEnabled = false;
     private int resendTime = 90;
+    private String isOTP, generateOtp;
+    private long otpCreateOnTime;
+
+    private int atp = 0;
+    private final int MAX_ATP = 3;
 
     private int selectedETPosition = 0;
+
+    private TextView txtWarning;
+    private Button verifyBtnFW;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +65,18 @@ public class ForgotPasswordOTP extends AppCompatActivity {
         otp6 = findViewById(R.id.otpET6);
 
         resendBtnFW = findViewById(R.id.resendBtnFW);
+        verifyBtnFW = findViewById(R.id.verifyBtnFW);
 
-        final Button verifyBtnFW = findViewById(R.id.verifyBtnFW);
         final TextView otpEmailFW = findViewById(R.id.otpEmailFW);
 
         final String getEmail = getIntent().getStringExtra("email");
 
+        isOTP = createOTP(6);
+        new EmailOTP(getEmail, "Your OTP Code", "Your OTP is: " + isOTP + ". This OTP will expire in 5 minutes.").execute();
+
         final ImageView backToForgotPasswordCheck = findViewById(R.id.backToForgotPasswordCheck);
+
+        txtWarning = findViewById(R.id.txtWarning);
 
         otpEmailFW.setText(getEmail);
 
@@ -76,21 +96,42 @@ public class ForgotPasswordOTP extends AppCompatActivity {
             public void onClick(View view) {
                 if (resendEnabled) {
 
+                    isOTP = createOTP(6);
+                    new EmailOTP(getEmail, "Your OTP Code", "Your OTP is: " + isOTP + ". This OTP will expire in 5 minutes.").execute();
+                    txtWarning.setVisibility(View.GONE);
+                    verifyBtnFW.setEnabled(true);
+                    atp = 0;
                     startCountDownTimer();
 
                 }
             }
         });
+
         verifyBtnFW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String generateOtp = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
+                generateOtp = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
 
-                if (generateOtp.length() == 6) {
-                    //handle your otp verification here
+                if (System.currentTimeMillis() - otpCreateOnTime > 300000) {
+                    Toast.makeText(ForgotPasswordOTP.this, "OTP expired", Toast.LENGTH_SHORT).show();
+                    verifyBtnFW.setEnabled(false);
+                } else {
+                    if (generateOtp.length() == 6) {
+                        if (generateOtp.equals(isOTP)) {
+
+                            isOTP = null;
+                            atp = 0;
+                            Intent intent = new Intent(ForgotPasswordOTP.this, ForgotPasswordChange.class);
+                            intent.putExtra("email", getEmail);
+                            startActivity(intent);
+
+                        } else {
+                            enterWrongOTPCode();
+                        }
+                    } else {
+                        enterWrongOTPCode();
+                    }
                 }
-                //if confirm correct otp
-                startActivity(new Intent(ForgotPasswordOTP.this, ForgotPasswordChange.class));
             }
         });
 
@@ -216,6 +257,28 @@ public class ForgotPasswordOTP extends AppCompatActivity {
             return true;
         } else {
             return super.onKeyUp(keyCode, event);
+        }
+    }
+    protected String createOTP(int length) {
+
+        String nums = "0123456789";
+        StringBuilder otp = new StringBuilder();
+
+        Random rand = new Random();
+
+        for (int i = 0; i < length; i++) {
+            otp.append(nums.charAt(rand.nextInt(nums.length())));
+        }
+        otpCreateOnTime = System.currentTimeMillis();
+        return otp.toString();
+    }
+
+    protected void enterWrongOTPCode() {
+        atp++;
+        txtWarning.setText(String.format("OTP not match. You have %d attempts left", MAX_ATP-atp));
+        txtWarning.setVisibility(View.VISIBLE);
+        if (atp >= MAX_ATP) {
+            verifyBtnFW.setEnabled(false);
         }
     }
 }

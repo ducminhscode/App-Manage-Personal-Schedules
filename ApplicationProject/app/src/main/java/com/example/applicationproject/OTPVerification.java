@@ -1,6 +1,7 @@
 package com.example.applicationproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,18 +22,30 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.applicationproject.Database.CreateDatabase;
+import com.example.applicationproject.OTPCode.EmailOTP;
+
+import java.util.Random;
 
 
 public class OTPVerification extends AppCompatActivity {
 
     private EditText otp1, otp2, otp3, otp4, otp5, otp6;
     private TextView resendBtn;
+    private Button verifyBtn;
 
     private boolean resendEnabled = false;
     private int resendTime = 90;
+    private long otpCreateOnTime;
 
     private int selectedETPosition = 0;
 
+    private String isOTP, generateOtp;
+
+    private int atp = 0;
+    private final int MAX_ATP = 3;
+
+    private TextView txtWarning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +66,22 @@ public class OTPVerification extends AppCompatActivity {
         otp6 = findViewById(R.id.otpET6);
 
         resendBtn = findViewById(R.id.resendBtn);
+        verifyBtn = findViewById(R.id.verifyBtn);
 
-        final Button verifyBtn = findViewById(R.id.verifyBtn);
         final TextView otpEmail = findViewById(R.id.otpEmail);
         final TextView otpMobile = findViewById(R.id.otpMobile);
 
+        txtWarning = findViewById(R.id.txtWarning);
+
+        final String getName = getIntent().getStringExtra("name");
         final String getEmail = getIntent().getStringExtra("email");
         final String getMobile = getIntent().getStringExtra("mobile");
+        final String getPassword = getIntent().getStringExtra("password");
 
         final ImageView backToRegister = findViewById(R.id.backToRegister);
 
-        otpEmail.setText(getEmail);
-        otpMobile.setText(getMobile);
-
+        isOTP = createOTP(6);
+        new EmailOTP(getEmail, "Your OTP Code", "Your OTP is: " + isOTP + ". This OTP will expire in 5 minutes.").execute();
 
         otp1.addTextChangedListener(textWatcher);
         otp2.addTextChangedListener(textWatcher);
@@ -74,37 +90,67 @@ public class OTPVerification extends AppCompatActivity {
         otp5.addTextChangedListener(textWatcher);
         otp6.addTextChangedListener(textWatcher);
 
-        final String generateOtp = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
 
-        showKeyboard(otp1);
-
-        startCountDownTimer();
-
-        resendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (resendEnabled) {
-
-                    startCountDownTimer();
-
-                }
-            }
-        });
-
-        verifyBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (generateOtp.length() == 6) {
-                    //handle your otp verification here
-                }
-            }
-        });
         backToRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
+
+        otpEmail.setText(getEmail);
+        otpMobile.setText(getMobile);
+
+        showKeyboard(otp1);
+
+        verifyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                generateOtp = otp1.getText().toString() + otp2.getText().toString() + otp3.getText().toString() + otp4.getText().toString() + otp5.getText().toString() + otp6.getText().toString();
+
+                if (System.currentTimeMillis() - otpCreateOnTime > 300000) {
+                    Toast.makeText(OTPVerification.this, "OTP expired", Toast.LENGTH_SHORT).show();
+                    verifyBtn.setEnabled(false);
+                } else {
+                    if (generateOtp.length() == 6) {
+                        if (generateOtp.equals(isOTP)) {
+
+                            Toast.makeText(OTPVerification.this, "Register successfully", Toast.LENGTH_SHORT).show();
+                            isOTP = null;
+                            atp = 0;
+
+                            CreateDatabase credb = new CreateDatabase(OTPVerification.this);
+                            credb.addUser(getName, getEmail, getMobile, getPassword);
+
+                            startActivity(new Intent(OTPVerification.this, Login.class));
+                        } else {
+                            enterWrongOTPCode();
+                        }
+                    } else {
+                        enterWrongOTPCode();
+                    }
+                }
+            }
+        });
+
+        resendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (resendEnabled) {
+
+                    isOTP = createOTP(6);
+                    new EmailOTP(getEmail, "Your OTP Code", "Your OTP is: " + isOTP + ". This OTP will expire in 5 minutes.").execute();
+                    txtWarning.setVisibility(View.GONE);
+                    verifyBtn.setEnabled(true);
+                    atp = 0;
+                    startCountDownTimer();
+
+                }
+            }
+        });
+
+        startCountDownTimer();
     }
 
     private void showKeyboard(EditText otpET) {
@@ -216,6 +262,29 @@ public class OTPVerification extends AppCompatActivity {
             return true;
         } else {
             return super.onKeyUp(keyCode, event);
+        }
+    }
+
+    protected String createOTP(int length) {
+
+        String nums = "0123456789";
+        StringBuilder otp = new StringBuilder();
+
+        Random rand = new Random();
+
+        for (int i = 0; i < length; i++) {
+            otp.append(nums.charAt(rand.nextInt(nums.length())));
+        }
+        otpCreateOnTime = System.currentTimeMillis();
+        return otp.toString();
+    }
+
+    protected void enterWrongOTPCode() {
+        atp++;
+        txtWarning.setText(String.format("OTP not match. You have %d attempts left", MAX_ATP-atp));
+        txtWarning.setVisibility(View.VISIBLE);
+        if (atp >= MAX_ATP) {
+            verifyBtn.setEnabled(false);
         }
     }
 }
