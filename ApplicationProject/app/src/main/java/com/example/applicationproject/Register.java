@@ -130,47 +130,51 @@ public class Register extends AppCompatActivity {
             public void onClick(View view) {
                 if (checkLegitBtn.isChecked()) {
 
-                    boolean isValidUser = db.checkUsernameExists(name.getText().toString());
-                    boolean isValidEmail = db.checkEmailExists(email.getText().toString());
-                    boolean isValidMobile = db.checkExists(mobile.getText().toString());
+                    String txtName = name.getText().toString();
+                    String txtEmail = email.getText().toString();
+                    String txtMobile = mobile.getText().toString();
 
-                    if (name.getText().toString().isEmpty()) {
+                    boolean isUserExists = db.checkUsernameExists(txtName);
+                    boolean isEmailExists = db.checkEmailExists(txtEmail);
+                    boolean isMobileExists = db.checkMobileExists(txtMobile);
+
+                    if (txtName.isEmpty()) {
                         name.setError("Please enter your username");
                         name.requestFocus();
 
-                    } else if (name.getText().toString().contains(" ")) {
+                    } else if (txtName.contains(" ")) {
                         name.setError("The string contains spaces");
                         name.requestFocus();
 
-                    } else if (isValidUser) {
+                    } else if (isUserExists) {
                         name.setError("Username already exists");
                         name.requestFocus();
 
-                    } else if (email.getText().toString().isEmpty()) {
+                    } else if (txtEmail.isEmpty()) {
                         email.setError("Please enter your email");
                         email.requestFocus();
 
-                    } else if (email.getText().toString().contains(" ")) {
+                    } else if (txtEmail.contains(" ")) {
                         email.setError("The string contains spaces");
                         email.requestFocus();
 
-                    } else if (!Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
+                    } else if (!Patterns.EMAIL_ADDRESS.matcher(txtEmail).matches()) {
                         email.setError("Email not valid");
                         email.requestFocus();
 
-                    } else if (isValidEmail) {
+                    } else if (isEmailExists) {
                         email.setError("Email already exists");
                         email.requestFocus();
 
-                    } else if (mobile.getText().toString().isEmpty()) {
+                    } else if (txtMobile.isEmpty()) {
                         mobile.setError("Please enter your mobile");
                         mobile.requestFocus();
 
-                    } else if (!mobile.getText().toString().matches("^(0[1-9]\\d{8,9})$")) {
+                    } else if (!txtMobile.matches("^(0[1-9]\\d{8,9})$")) {
                         mobile.setError("Mobile not valid");
                         mobile.requestFocus();
 
-                    } else if (isValidMobile) {
+                    } else if (isMobileExists) {
                         mobile.setError("Mobile already exists");
                         mobile.requestFocus();
 
@@ -192,9 +196,9 @@ public class Register extends AppCompatActivity {
 
                     } else {
 
-                        final String getNameTxt = name.getText().toString().trim();
-                        final String getEmailTxt = email.getText().toString().trim();
-                        final String getMobileTxt = mobile.getText().toString().trim();
+                        final String getNameTxt = txtName.trim();
+                        final String getEmailTxt = txtEmail.trim();
+                        final String getMobileTxt = txtMobile.trim();
                         final String getPasswordTxt = password.getText().toString().trim();
 
 

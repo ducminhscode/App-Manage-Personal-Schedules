@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -35,6 +34,7 @@ public class ForgotPasswordCheck extends AppCompatActivity {
 
         final ImageView backToLogin = findViewById(R.id.backToLogin);
         final EditText emailAddressFW = findViewById(R.id.emailAddressFW);
+        final EditText userNameFW = findViewById(R.id.userNameFW);
         final AppCompatButton nextBtnFW = findViewById(R.id.nextBtnFW);
 
         db = new CreateDatabase(this);
@@ -50,30 +50,42 @@ public class ForgotPasswordCheck extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                boolean isValidEmail = db.checkEmailExists(emailAddressFW.getText().toString());
+                String txtUsernameFW = userNameFW.getText().toString();
+                String txtEmailAddressFW = emailAddressFW.getText().toString();
 
-                if (emailAddressFW.getText().toString().isEmpty()) {
+                boolean isValidUsernameAndEmail = db.checkUsernameAndEmail(txtUsernameFW, txtEmailAddressFW);
+
+                boolean isUsernameExists = db.checkUsernameExists(txtUsernameFW);
+                boolean isEmailExists = db.checkEmailExists(txtEmailAddressFW);
+
+
+                if (txtUsernameFW.isEmpty()) {
+                    userNameFW.setError("Please enter your username");
+                    userNameFW.requestFocus();
+                } else if (txtEmailAddressFW.isEmpty()) {
                     emailAddressFW.setError("Please enter your email");
                     emailAddressFW.requestFocus();
 
-                } else if (emailAddressFW.getText().toString().contains(" ")) {
-                    emailAddressFW.setError("The string contains spaces");
-                    emailAddressFW.requestFocus();
+                } else if (!isUsernameExists) {
+                    userNameFW.setError("Username not found");
+                    userNameFW.requestFocus();
 
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(emailAddressFW.getText().toString()).matches()) {
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(txtEmailAddressFW).matches()) {
                     emailAddressFW.setError("Email not valid");
                     emailAddressFW.requestFocus();
 
-                } else if (!isValidEmail) {
-                    Toast.makeText(ForgotPasswordCheck.this, "Email not found", Toast.LENGTH_SHORT).show();
+                } else if (!isEmailExists || !isValidUsernameAndEmail) {
+                    emailAddressFW.setError("Email not found");
+                    emailAddressFW.requestFocus();
+
                 } else {
 
-                final String getEmailTxt = emailAddressFW.getText().toString();
+                    final String getEmailTxt = txtEmailAddressFW;
 
-                Intent intent = new Intent(ForgotPasswordCheck.this, ForgotPasswordOTP.class);
-                intent.putExtra("email", getEmailTxt);
+                    Intent intent = new Intent(ForgotPasswordCheck.this, ForgotPasswordOTP.class);
+                    intent.putExtra("email", getEmailTxt);
 
-                startActivity(intent);
+                    startActivity(intent);
                 }
             }
         });

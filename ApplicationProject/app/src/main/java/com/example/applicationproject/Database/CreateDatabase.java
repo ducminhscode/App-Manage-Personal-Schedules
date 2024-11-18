@@ -105,17 +105,17 @@ public class CreateDatabase extends SQLiteOpenHelper {
         return userExists;
     }
 
-    //Kiểm tra đổi mật khẩu
-    public boolean checkPassword(String email, String password){
+    //Kiểm tra nguoi dung va email
+    public boolean checkUsernameAndEmail(String username, String email){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER + " WHERE "
-                + USER_EMAIL + " = ? AND " + USER_PASSWORD + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[] { email, password });
-        boolean passExists = cursor.getCount() > 0;
+                + USER_NAME + " = ? AND " + USER_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[] { username, email });
+        boolean nameExists = cursor.getCount() > 0;
         cursor.close();
         db.close();
 
-        return passExists;
+        return nameExists;
     }
 
     //Kiểm tra người dùng có tồn tại hay chưa
@@ -145,7 +145,7 @@ public class CreateDatabase extends SQLiteOpenHelper {
     }
 
     //Kiểm tra số điện thoại có tồn tại hay chưa
-    public boolean checkExists(String mobile){
+    public boolean checkMobileExists(String mobile){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER + " WHERE " + USER_MOBILE + " = ?";
 

@@ -109,12 +109,23 @@
             android:src="@drawable/hide" />
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/txtWrong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="25dp"
+        android:layout_gravity="left"
+        android:textColor="#FF0000"
+        android:visibility="gone"
+        android:textSize="15sp" />
+
     <!--Nhớ tài khoản và quên mật khẩu-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -147,7 +158,7 @@
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/round_back_primary_15"
         android:text="@string/sign_in"

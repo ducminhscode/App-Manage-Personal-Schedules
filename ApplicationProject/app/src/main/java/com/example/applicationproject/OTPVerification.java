@@ -111,6 +111,7 @@ public class OTPVerification extends AppCompatActivity {
 
                 if (System.currentTimeMillis() - otpCreateOnTime > 300000) {
                     Toast.makeText(OTPVerification.this, "OTP expired", Toast.LENGTH_SHORT).show();
+                    isOTP = null;
                     verifyBtn.setEnabled(false);
                 } else {
                     if (generateOtp.length() == 6) {

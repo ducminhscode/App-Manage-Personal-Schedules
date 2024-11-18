@@ -114,6 +114,7 @@ public class ForgotPasswordOTP extends AppCompatActivity {
 
                 if (System.currentTimeMillis() - otpCreateOnTime > 300000) {
                     Toast.makeText(ForgotPasswordOTP.this, "OTP expired", Toast.LENGTH_SHORT).show();
+                    isOTP = null;
                     verifyBtnFW.setEnabled(false);
                 } else {
                     if (generateOtp.length() == 6) {

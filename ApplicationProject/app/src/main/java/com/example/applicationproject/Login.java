@@ -32,13 +32,14 @@ import com.google.android.gms.tasks.Task;
 public class Login extends AppCompatActivity {
 
     private boolean passwordShowing = false;
-    private boolean remember = false;
+    private boolean remember = true;
 
     private CreateDatabase db;
 
     protected GoogleSignInClient mGoogleSignInClient;
     protected static final int RC_SIGN_IN = 9001;
 
+    private TextView txtWrong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,8 @@ public class Login extends AppCompatActivity {
         final AppCompatButton signInBtnLogin = findViewById(R.id.signInBtnLogin);
         final CheckBox checkRememberBtn = findViewById(R.id.checkRememberBtn);
 
+        txtWrong = findViewById(R.id.txtWrong);
+
         db = new CreateDatabase(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -72,7 +75,6 @@ public class Login extends AppCompatActivity {
         String ps = pref.getString("PASSWORD", "");
         userNameET.setText(un);
         passwordET.setText(ps);
-
 
         checkRememberBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -109,18 +111,27 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                boolean isValidUser = db.checkUser(userNameET.getText().toString(), passwordET.getText().toString());
+                String txtUserNameET = userNameET.getText().toString();
+                String txtPasswordET = passwordET.getText().toString();
 
-                if (userNameET.getText().toString().isEmpty()) {
+                boolean isValidUser = db.checkUser(txtUserNameET, txtPasswordET);
+
+                if (txtUserNameET.isEmpty()) {
                     userNameET.setError("Please enter your username");
                     userNameET.requestFocus();
-                } else if (passwordET.getText().toString().isEmpty()) {
+                } else if (txtPasswordET.isEmpty()) {
                     passwordET.setError("Please enter your password");
                     passwordET.requestFocus();
                 } else if (!isValidUser) {
-                    Toast.makeText(Login.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                    userNameET.setText(null);
+                    passwordET.setText(null);
+                    userNameET.clearFocus();
+                    passwordET.clearFocus();
+                    txtWrong.setText("Invalid username or password");
+                    txtWrong.setVisibility(View.VISIBLE);
                 } else {
-                    rememberUser(userNameET.getText().toString(), passwordET.getText().toString(), remember);
+                    txtWrong.setVisibility(View.GONE);
+                    rememberUser(txtUserNameET, txtPasswordET, remember);
                     startActivity(new Intent(Login.this, MainActivity.class));
                 }
             }

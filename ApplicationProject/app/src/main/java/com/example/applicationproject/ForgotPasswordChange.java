@@ -110,24 +110,27 @@ public class ForgotPasswordChange extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (newPassword.getText().toString().isEmpty()) {
+                String txtNewPassword = newPassword.getText().toString();
+                String txtConfirmPassword = confirmPassword.getText().toString();
+
+                if (txtNewPassword.isEmpty()) {
                     newPassword.setError("Please enter your password");
                     newPassword.requestFocus();
 
-                } else if (!valid.isPasswordValid(newPassword.getText().toString())) {
+                } else if (!valid.isPasswordValid(txtNewPassword)) {
                     newPassword.setError("Password must contain at least 8 characters, including a letter, a digit, and a special character");
                     newPassword.requestFocus();
 
-                } else if (confirmPassword.getText().toString().isEmpty()) {
+                } else if (txtConfirmPassword.isEmpty()) {
                     confirmPassword.setError("Please enter confirm password");
                     confirmPassword.requestFocus();
 
-                } else if (!newPassword.getText().toString().equals(confirmPassword.getText().toString())) {
+                } else if (!txtNewPassword.equals(txtConfirmPassword)) {
                     confirmPassword.setError("Password not match");
                     confirmPassword.requestFocus();
 
                 } else {
-                    boolean updateSuccess = db.updatePassword(getEmail, newPassword.getText().toString());
+                    boolean updateSuccess = db.updatePassword(getEmail, txtNewPassword);
                     if (updateSuccess) {
                         Toast.makeText(ForgotPasswordChange.this, "Password changed successfully", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(ForgotPasswordChange.this, Login.class));
