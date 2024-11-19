@@ -1,4 +1,4 @@
-package com.example.applicationproject;
+package com.example.applicationproject.Controller;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.applicationproject.R;
 
 public class ForgotPasswordOTP extends AppCompatActivity {
 
@@ -148,33 +150,29 @@ public class ForgotPasswordOTP extends AppCompatActivity {
         @Override
         public void afterTextChanged(Editable editable) {
 
-            if(editable.length() > 0){
-                if(selectedETPosition==0){
+            if (editable.length() > 0) {
+                if (selectedETPosition == 0) {
 
-                    selectedETPosition=1;
+                    selectedETPosition = 1;
                     showKeyboard(otp2);
 
-                }
-                else if(selectedETPosition==1){
+                } else if (selectedETPosition == 1) {
 
-                    selectedETPosition=2;
+                    selectedETPosition = 2;
                     showKeyboard(otp3);
 
-                }
-                else if(selectedETPosition==2){
+                } else if (selectedETPosition == 2) {
 
-                    selectedETPosition=3;
+                    selectedETPosition = 3;
                     showKeyboard(otp4);
-                }
-                else if(selectedETPosition==3){
+                } else if (selectedETPosition == 3) {
 
-                    selectedETPosition=4;
+                    selectedETPosition = 4;
                     showKeyboard(otp5);
 
-                }
-                else if(selectedETPosition==4){
+                } else if (selectedETPosition == 4) {
 
-                    selectedETPosition=5;
+                    selectedETPosition = 5;
                     showKeyboard(otp6);
 
                 }

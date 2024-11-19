@@ -1,4 +1,4 @@
-package com.example.applicationproject;
+package com.example.applicationproject.Controller;
 
 import android.os.Bundle;
 import android.webkit.WebSettings;
@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.applicationproject.R;
 
 public class PrivacyPolicyAndTermsOfService extends AppCompatActivity {
 

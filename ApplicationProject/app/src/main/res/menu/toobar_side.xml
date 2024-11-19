@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/Managelist"
+            android:title="@string/Managelist"/>
+        <item
+            android:id="@+id/searching"
+            android:title="@string/searching"/>
+        <item
+            android:id="@+id/Ordertask"
+            android:title="@string/Ordertask"/>
+        <item
+            android:id="@+id/UpgragePro"
+            android:title="@string/UpgragePro"/>
+    </group>
+</menu>

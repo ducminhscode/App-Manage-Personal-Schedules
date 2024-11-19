@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignTop="@+id/include"-->
+<!--        android:background="@drawable/baseline_more_vert_24"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_marginEnd="32dp" />-->
+
+    <FrameLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:id="@+id/Framelayout_view"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fab"
+        app:layout_anchor="@id/bottomNavigationView"
+        android:src="@drawable/add"
+        app:fabCustomSize="70dp"
+        android:contentDescription="@string/fab_des"
+        />
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/primary"
+        android:visibility="visible"
+        app:fabCradleMargin="15dp"
+        app:fabCradleRoundedCornerRadius="20dp"
+        app:fabCradleVerticalOffset="10dp"
+        android:theme="@style/MyApp">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@id/bottomNavigationView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="20dp"
+            android:background="@android:color/transparent"
+            app:itemIconSize="25dp"
+            app:labelVisibilityMode="labeled"
+            app:itemTextColor="@color/black"
+            app:menu="@menu/acitvity_bottombar"
+            android:theme="@style/MyApp"
+            >
+
+            <!--            <ImageButton-->
+            <!--                android:layout_width="50dp"-->
+            <!--                android:layout_height="50dp"-->
+            <!--                android:layout_gravity="center_vertical"-->
+            <!--                android:layout_marginStart="10dp"-->
+            <!--                android:layout_marginTop="20dp"-->
+            <!--                android:background="@drawable/taskbar"-->
+            <!--                android:id="@+id/img_open_nav"-->
+            <!--                />-->
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/taskbar" />
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+
+    <!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:id="@+id/toobar"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:layout_marginBottom="81dp"-->
+<!--        android:layout_toStartOf="@+id/bottomNavigationView">-->
+
+<!--        <androidx.constraintlayout.utils.widget.ImageFilterButton-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_gravity="center_vertical|center"-->
+<!--            android:background="transparent"-->
+<!--            android:src="@drawable/baseline_more_vert_24" />-->
+<!--    </androidx.appcompat.widget.Toolbar>-->
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

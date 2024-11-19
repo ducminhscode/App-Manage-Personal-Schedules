@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/markdone_menu"
+        android:title="Đánh dấu đã xong"/>
+
+    <item
+        android:id="@+id/delaytomorrow_menu"
+        android:title="Hoãn lại vào ngày mai"/>
+
+    <item
+        android:id="@+id/ordering_menu"
+        android:title="Sắp xếp lại"/>
+
+    <item
+        android:id="@+id/sharing_menu"
+        android:title="Chia sẻ"/>
+
+    <item
+        android:id="@+id/deleting_menu"
+        android:title="Xóa"/>
+</menu>

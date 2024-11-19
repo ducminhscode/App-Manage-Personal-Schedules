@@ -3,5 +3,35 @@
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign In</string>
     <string name="web_client_id">666234794614-k7gun4ks9k4r8vlhk7mf819en95ktujs.apps.googleusercontent.com</string>
-
+    <string name="activity_drawer_upgragePro">Nâng cấp lên Pro</string>
+    <string name="activity_drawer_starTask">Star Task</string>
+    <string name="Themeplate">Chủ đề</string>
+    <string name="utilities">Tiện ích</string>
+    <string name="response">Phản Hồi</string>
+    <string name="setting">Cài đặt</string>
+    <string name="signout">Đăng Xuất</string>
+    <string name="Misson">Nhiệm vụ</string>
+    <string name="Calendar">Lịch</string>
+    <string name="My">Của tôi</string>
+    <string name="Managelist">Quản lý danh mục</string>
+    <string name="searching">Tìm kiếm</string>
+    <string name="Ordertask">Sắp xếp công việc</string>
+    <string name="UpgragePro">Nâng cấp lên Pro</string>
+    <string name="open_drawer">Open navigation drawer</string>
+    <string name="close_drawer">Close navigation drawer</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name_core">To Do List</string>
+    <string name="slogan">Let\'s make it happen</string>
+    <string name="fab_des">Add a new item</string>
+    <string name="misson_report">Kiểm tra tất cả các nhiệm vụ đã hoàn thành</string>
+    <string name="past">Trước</string>
+    <string name="month">THÁNG</string>
+    <string name="present">Tương lai</string>
+    <string name="Today">Hôm nay</string>
+    <string name="complete">Đã hoàn thành hôm nay</string>
+    <string name="alternative_calendar">Lịch thay thế</string>
+    <string name="combind_event_sys">Đồng bộ sự kiện lịch hệ thống</string>
 </resources>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/popup">
+
+    <TextView
+        android:padding="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:textAlignment="center"
+        android:layout_height="wrap_content"
+        android:text="Vui lòng đánh giá chúng tôi 5 sao nếu bạn thích ứng dụng của chúng tôi"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:layout_height="wrap_content"
+        android:text="Chúng tôi đang làm việc chăm chỉ để cung cấo trải nghiệm người dùng tốt hơn"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:gravity="center">
+
+        <ImageView
+            android:alpha="0.5"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/star_icon"/>
+
+        <ImageView
+            android:layout_marginStart="15dp"
+            android:alpha="0.5"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/star_icon"/>
+
+        <ImageView
+            android:layout_marginStart="15dp"
+            android:alpha="0.5"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/star_icon"/>
+
+        <ImageView
+            android:layout_marginStart="15dp"
+            android:alpha="0.5"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/star_icon"/>
+
+        <ImageView
+            android:layout_marginStart="15dp"
+            android:alpha="0.5"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/star_icon"/>
+
+    </LinearLayout>
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:gravity="center"
+       android:padding="10dp">
+
+       <androidx.appcompat.widget.AppCompatButton
+           android:paddingStart="120dp"
+           android:paddingEnd="120dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="ĐÁNH GIÁ"
+           android:textSize="18sp"
+           android:textColor="@color/white"
+           android:background="@drawable/round_back_primary_15"/>
+
+       <androidx.appcompat.widget.AppCompatButton
+           android:layout_marginTop="10dp"
+           android:paddingStart="120dp"
+           android:paddingEnd="120dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="PHẢN HỒI"
+           android:textColor="@color/white"
+           android:textSize="18sp"
+           android:background="@drawable/round_back_primary_15"/>
+   </LinearLayout>
+
+</LinearLayout>

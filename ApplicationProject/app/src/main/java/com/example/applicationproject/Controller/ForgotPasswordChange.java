@@ -1,4 +1,4 @@
-package com.example.applicationproject;
+package com.example.applicationproject.Controller;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.applicationproject.Database.CreateDatabase;
+import com.example.applicationproject.Login;
+import com.example.applicationproject.R;
+import com.example.applicationproject.Register;
 
 
 public class ForgotPasswordChange extends AppCompatActivity {

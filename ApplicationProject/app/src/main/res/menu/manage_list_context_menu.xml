@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/editing_menu"
+        android:title="Chỉnh sửa"/>
+
+    <item
+        android:id="@+id/hiding_menu"
+        android:title="Ẩn dấu"/>
+
+    <item
+        android:id="@+id/deleting_menu"
+        android:title="Xóa"/>
+</menu>

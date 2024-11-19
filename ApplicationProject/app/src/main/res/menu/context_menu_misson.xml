@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/ManageList_menu"
+        android:title="Quản lý danh mục"/>
+
+    <item
+        android:id="@+id/Searching_menu"
+        android:title="Tìm kiếm"/>
+
+    <item
+        android:id="@+id/ManageJob_menu"
+        android:title="Sắp xếp công việc"/>
+
+    <item
+        android:id="@+id/Print_menu"
+        android:title="In"/>
+</menu>

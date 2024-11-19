@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/backgroundimg"
+    >
+
+    <ImageView
+        android:id="@+id/splashscreen_icon_view"
+        android:layout_width="200sp"
+        android:layout_height="200sp"
+        android:layout_marginTop="192dp"
+        android:background="@drawable/checklist_custom"
+        android:src="@drawable/checklist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/splashscreen_icon_view">
+
+        <TextView
+            android:id="@+id/textView_app_name1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="T"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/textView_app_name2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="o"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/textView_app_name3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="D"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/textView_app_name4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="o"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/textView_app_name5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="L"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/textView_app_name6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="i"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/textView_app_name7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="s"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+        <TextView
+            android:id="@+id/textView_app_name8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/adlam_display"
+            android:text="t"
+            android:textColor="#4b09d0"
+            android:textSize="50sp"
+            android:alpha="0"
+            />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,6 +18,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.applicationproject.Controller.PrivacyPolicyAndTermsOfService;
 import com.example.applicationproject.Database.CreateDatabase;
 
 
@@ -219,7 +220,7 @@ public class Register extends AppCompatActivity {
         });
     }
 
-    protected boolean isPasswordValid(String password) {
+    public boolean isPasswordValid(String password) {
         if (password.length() < 8) {
             return false;
         }

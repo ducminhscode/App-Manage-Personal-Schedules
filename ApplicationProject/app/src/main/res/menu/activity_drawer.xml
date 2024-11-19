@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/upgragePro"
+            android:title="@string/activity_drawer_upgragePro"
+            android:icon="@drawable/crown__1_"
+            />
+        <item
+            android:id="@+id/starTask"
+            android:title="@string/activity_drawer_starTask"
+            android:icon="@drawable/star_icon"
+            />
+    </group>
+    <group android:checkableBehavior="single">
+        <item android:title="Labels">
+            <menu>
+                <item
+                    android:id="@+id/Themeplate"
+                    android:title="@string/Themeplate"
+                    android:icon="@drawable/type"
+                    />
+                <item
+                    android:id="@+id/utilities"
+                    android:title="@string/utilities"
+                    android:icon="@drawable/tienich"
+                    />
+                <item
+                    android:id="@+id/respose"
+                    android:title="@string/response"
+                    android:icon="@drawable/response"
+                    />
+                <item
+                    android:id="@+id/setting"
+                    android:title="@string/setting"
+                    android:icon="@drawable/baseline_settings_24"
+                    />
+            </menu>
+        </item>
+    </group>
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/logout"
+            android:title="Account">
+            <menu>
+                <item
+                    android:id="@+id/signOutBtn"
+                    android:title="@string/signout"
+                    android:icon="@drawable/baseline_logout_24"/>
+            </menu>
+        </item>
+    </group>
+</menu>

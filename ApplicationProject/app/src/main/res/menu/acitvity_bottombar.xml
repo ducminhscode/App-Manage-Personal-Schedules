@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="bottomNavigationView">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/Taskbar"
+            android:title=""
+            />
+        <item
+            android:id="@+id/Misson"
+            android:title="@string/Misson"
+            android:icon="@drawable/misson"
+            />
+        <item
+            android:id="@+id/Space"
+            android:title=""
+            />
+        <item
+            android:id="@+id/Calendar"
+            android:title="@string/Calendar"
+            android:icon="@drawable/calendar"
+            />
+        <item
+            android:id="@+id/My"
+            android:title="@string/My"
+            android:icon="@drawable/user"
+            />
+    </group>
+</menu>
