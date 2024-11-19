@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".My_info_fragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -13,23 +14,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:gravity="center_vertical">
 
                 <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@drawable/circle_profile"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp">
 
                     <TextView
+                        android:textSize="20sp"
+                        android:textColor="@color/black"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Chào Trần Nhật Minh"/>
@@ -44,35 +53,63 @@
             </LinearLayout>
 
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                app:cardCornerRadius="5dp">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="10dp">
 
-                    <TextView
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/presents"/>
+
+
+                    <LinearLayout
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nâng cấp lên PRO"/>
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:textSize="18sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nâng cấp lên PRO"/>
+
+                        <TextView
+                            android:layout_marginTop="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mở khóa tất cả tính năng của PRO"/>
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:layout_width="95dp"
                         android:layout_height="wrap_content"
-                        android:text="Mở khóa tất cả tính năng của PRO"/>
+                        android:drawableLeft="@drawable/crown__1_"
+                        android:text="PRO"
+                        android:background="@drawable/custom_btn_pro"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"/>
 
                 </LinearLayout>
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+            </androidx.cardview.widget.CardView>
 
-            </LinearLayout>
 
             <TextView
+                android:padding="10dp"
+                android:textSize="15sp"
+                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tổng quan nhiệm vụ về nhiệm vụ"/>
@@ -80,124 +117,199 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:gravity="center">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="10dp">
 
-                        <TextView
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="13"
-                            />
+                            android:orientation="vertical"
+                            android:padding="10dp"
+                            android:gravity="center"
+                            android:background="@color/grey"
+                            >
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Nhiệm vụ đã hoàn thành"
-                            />
+                            <ImageButton
+                                android:layout_gravity="end"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/question_mask_circle"
+                                android:visibility="invisible"/>
+
+
+                            <TextView
+                                android:layout_marginBottom="10dp"
+                                android:textSize="20sp"
+                                android:textColor="@color/black"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="13"
+                                />
+
+                            <TextView
+                                android:layout_width="130dp"
+                                android:layout_height="wrap_content"
+                                android:text="Nhiệm vụ đã hoàn thành"
+                                />
+
+                        </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="10dp"
+                    android:layout_marginStart="20dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:background="@color/grey">
 
                         <ImageButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                        <TextView
+                            android:layout_gravity="end"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="7"
-                            />
+                            android:background="@drawable/question_mask_circle" />
 
                         <TextView
+                            android:layout_marginBottom="10dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/black"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nhiệm vụ chưa hoàn thành"
-                            />
+                            android:text="7" />
+
+                        <TextView
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:text="Nhiệm vụ chưa hoàn thành" />
+
+                    </LinearLayout>
+
                 </androidx.cardview.widget.CardView>
+
 
             </LinearLayout>
 
             <androidx.cardview.widget.CardView
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Hoàn thành nhiệm vụ hàng ngày"/>
+                        android:orientation="horizontal"
+                        android:padding="10dp">
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/calendar_arrow_right"/>
+                        <TextView
+                            android:layout_width="150dp"
+                            android:layout_height="wrap_content"
+                            android:text="Hoàn thành nhiệm vụ hàng ngày"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="11/3-11/9"/>
+                        <ImageButton
+                            android:layout_marginStart="90dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/calendar_arrow_right"/>
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/calendar_arrow_left"/>
+                        <TextView
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="11/3-11/9"/>
+
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/calendar_arrow_left"/>
+
+                    </LinearLayout>
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
-
-                <com.github.mikephil.charting.charts.BarChart
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
 
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Phân loại nhiệm vụ chưa hòan thành"/>
-
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tất cả"
-                        android:drawableStart="@drawable/baseline_arrow_drop_down_24"
-                        />
-                </LinearLayout>
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp">
 
                <LinearLayout
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
-                   android:orientation="horizontal">
+                   android:orientation="vertical">
 
-                   <com.github.mikephil.charting.charts.PieChart
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"/>
-
-                   <androidx.recyclerview.widget.RecyclerView
-                       android:layout_width="wrap_content"
+                   <LinearLayout
+                       android:layout_width="match_parent"
                        android:layout_height="wrap_content"
-                       android:orientation="vertical"/>
+                       android:orientation="horizontal"
+                       android:padding="10dp"
+                       android:gravity="center_vertical">
+
+                       <TextView
+                           android:layout_width="150dp"
+                           android:layout_height="wrap_content"
+                           android:text="Phân loại nhiệm vụ chưa hòan thành"/>
+
+                       <ImageView
+                           android:layout_marginStart="130dp"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:background="@drawable/baseline_arrow_drop_down_24"/>
+
+                       <TextView
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:text="Tất cả"/>
+
+                   </LinearLayout>
+
+                   <LinearLayout
+                       android:padding="10dp"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:orientation="horizontal"
+                       >
+
+                       <com.github.mikephil.charting.charts.PieChart
+                           android:layout_weight="1"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"/>
+
+                       <androidx.recyclerview.widget.RecyclerView
+                           android:layout_weight="1"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:orientation="vertical"/>
+
+                   </LinearLayout>
+
 
                </LinearLayout>
-
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
