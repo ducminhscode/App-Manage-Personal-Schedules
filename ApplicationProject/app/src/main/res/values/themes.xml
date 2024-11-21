@@ -5,10 +5,20 @@
         <!-- Customize your light theme here. -->
          <!-- Cấu hình Splash Screen -->
     </style>
+    
+    <style name="Theme.Admin" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#130041</item>
+        <item name="colorPrimaryVariant">#B74CFC</item>
+        <item name="colorOnPrimary">#6E56E2</item>
+        <item name="colorSecondary">#FFFFFF</item>
+    </style>
 
     <style name="MyApp" parent="Base.Theme.ApplicationProject">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">#6200EE</item>
+        <item name="colorPrimaryVariant">#3700B3</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
     </style>
 
 <!--    <style name="ThemeOverlay.ApplicationProject.FullscreenContainer" parent="">-->

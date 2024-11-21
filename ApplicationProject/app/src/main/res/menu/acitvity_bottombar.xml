@@ -19,7 +19,7 @@
         <item
             android:id="@+id/Calendar"
             android:title="@string/Calendar"
-            android:icon="@drawable/calendar"
+            android:icon="@drawable/calendaricon"
             />
         <item
             android:id="@+id/My"
