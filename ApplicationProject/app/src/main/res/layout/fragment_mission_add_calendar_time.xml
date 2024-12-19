@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_background_2">
+
+    <TimePicker
+        android:id="@+id/timePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:timePickerMode="spinner" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:gravity="end|center_vertical">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cancelBtnTime"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@android:color/transparent"
+            android:textColor="@color/caption2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/okBtnTime"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@android:color/transparent"
+            android:textColor="@color/caption2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ok"/>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,7 +1,29 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.ApplicationProject" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    </style>
+
+    <!--dark_mode-->
+    <style name="SRCEEN">
+        <item name="android:background">@color/black</item>
+    </style>
+
+    <style name="TEXT">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="BUTTON">
+        <item name="android:background">@color/caption5</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TEXT_BUTTON">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TEXT_INPUT">
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

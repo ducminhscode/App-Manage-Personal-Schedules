@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Tiêu đề - Quản lý hình ảnh -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Manage Galerry"
+        android:textSize="18sp"
+        android:textColor="#000"
+        android:padding="16dp"
+        android:textStyle="bold" />
+
+    <!-- Nút thoát (Back Button) -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:contentDescription="Back"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:onClick="onBackPressed"/>
+
+    <!-- RecyclerView để hiển thị danh sách hình ảnh -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewImages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/add_image_layout"
+        android:layout_below="@+id/title"
+        />
+
+    <!-- Layout để thêm hình ảnh (Từ URL và Gallery) -->
+    <LinearLayout
+        android:id="@+id/add_image_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:layout_marginEnd="10dp"
+            android:id="@+id/btnAddImageFromURL"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Image from URL"/>
+
+        <Button
+            android:id="@+id/btnAddImageFromGallery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Image from Gallery"/>
+    </LinearLayout>
+</RelativeLayout>

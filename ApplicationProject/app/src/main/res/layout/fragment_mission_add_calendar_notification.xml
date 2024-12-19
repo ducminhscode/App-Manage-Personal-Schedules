@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dialog_background_2">
+
+        <TextView
+            android:padding="10dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Setting reminders"/>
+
+        <RadioButton
+            android:id="@+id/rd_sametime"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Same Time"/>
+
+        <RadioButton
+            android:id="@+id/rd_5m_ago"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5 minutes ago"/>
+
+        <RadioButton
+            android:id="@+id/rd_10m_ago"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="10 minutes ago"/>
+
+        <RadioButton
+            android:id="@+id/rd_30m_ago"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="30 minutes ago"/>
+
+        <RadioButton
+            android:id="@+id/rd_15m_ago"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="15 minutes ago"/>
+
+        <RadioButton
+            android:id="@+id/rd_1d_ago"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1 days ago"/>
+
+        <RadioButton
+            android:id="@+id/rd_2d_ago"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2 days ago"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:gravity="end|center_vertical">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/noBtnNotification"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/primary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancel"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/yesBtnNotification"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/primary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Save"/>
+
+        </LinearLayout>
+
+</LinearLayout>

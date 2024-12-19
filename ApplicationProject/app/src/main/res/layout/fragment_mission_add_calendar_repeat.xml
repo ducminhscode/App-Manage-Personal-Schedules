@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_background_2"
+    android:padding="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:id="@+id/repeat"
+        android:layout_height="72dp">
+
+        <ImageView
+            android:id="@+id/repeat_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="32dp"
+            android:src="@drawable/repeat"
+            android:layout_centerVertical="true" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/repeat_ll"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/repeat_icon"
+            android:gravity="center"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/repeat_text"
+                android:textColor="@color/caption1"
+                android:layout_width="wrap_content"
+                android:textSize="17sp"
+                android:layout_height="wrap_content"
+                android:text="Repeat" />
+
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/repeat_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="8dp"
+            android:onClick="onSwitchRepeat"
+            android:checked="true"
+            android:textOn="On"
+            android:textOff="Off"
+            android:backgroundTint="@color/caption1"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:id="@+id/RepeatNo"
+        android:clickable="true"
+        android:onClick="setRepeatNo"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_height="72dp">
+
+        <ImageView
+            android:id="@+id/repeat_no_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="32dp"
+            android:src="@drawable/baseline_format_list_numbered_24"
+            android:layout_centerVertical="true" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/repeat_no_icon"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/repeat_no_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Repeat Number"
+                android:textColor="@color/caption1"
+                android:textSize="17sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/set_repeat_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="65dp"
+            android:layout_marginLeft="65dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginBottom="26dp"
+            android:layout_toEndOf="@+id/linearLayout2"
+            android:layout_toRightOf="@+id/repeat_no_icon"
+            android:textColor="@color/abc_secondary_text_material_dark"
+            android:textSize="15dp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:id="@+id/RepeatType"
+        android:clickable="true"
+        android:onClick="selectRepeatType"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_height="72dp">
+
+        <ImageView
+            android:id="@+id/repeat_type_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="32dp"
+            android:src="@drawable/baseline_category_24"
+            android:layout_centerVertical="true" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/repeat_type_icon"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/repeat_type_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RepeatType"
+                android:textColor="@color/caption1"
+                android:textSize="17sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/set_repeat_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="65dp"
+            android:layout_marginLeft="65dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginBottom="26dp"
+            android:layout_toEndOf="@+id/linearLayout"
+            android:layout_toRightOf="@+id/linearLayout"
+            android:textColor="@color/abc_secondary_text_material_dark"
+            android:textSize="15dp" />
+
+
+    </RelativeLayout>
+
+
+
+</LinearLayout>

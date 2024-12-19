@@ -2,10 +2,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:replace="android:maxSdkVersion"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:name=".Application.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,32 +39,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ApplicationProject"
         tools:targetApi="31">
-        <meta-data
-            android:name="com.google.android.gms.auth.api.signin.CLIENT_ID"
-            android:value="@string/web_client_id" />
+
+        <service
+            android:name=".View_Controller.Service.FouroundService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:foregroundServiceType="dataSync"/>
+        <service android:name=".View_Controller.Service.ReminderAlarmService"/>
+        <receiver android:name=".View_Controller.BroadCastReciver.MyReceiver"/>
+        <provider
+            android:name=".Database.ToDoDBProvider"
+            android:authorities="com.example.contactsprovider"
+            android:exported="false"
+            android:readPermission="android.permission.READ_CONTACTS"
+            android:writePermission="android.permission.WRITE_CONTACTS" />
 
         <activity
-            android:name=".PrivacyPolicyAndTermsOfService"
-            android:exported="false" />
-        <activity
-            android:name=".ForgotPasswordChange"
-            android:exported="false" />
-        <activity
-            android:name=".ForgotPasswordOTP"
-            android:exported="false" />
-        <activity
-            android:name=".ForgotPasswordCheck"
-            android:exported="false" />
-        <activity
-            android:name=".OTPVerification"
-            android:exported="false">
-
-        </activity>
-        <activity
-            android:name=".Register"
-            android:exported="false" />
-        <activity
-            android:name=".Login"
+            android:name=".View_Controller.ScreenMainNoLogin"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,11 +62,69 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false">
 
-        </activity>
+        <activity
+            android:name=".View_Controller.ScreenMainLogin"
+            android:exported="false"/>
+
+        <meta-data
+            android:name="com.google.android.gms.auth.api.signin.CLIENT_ID"
+            android:value="@string/web_client_id" />
+
+        <activity
+            android:name=".View_Controller.UserLogin.PrivacyPolicyAndTermsOfService"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.UserLogin.ForgotPasswordChange"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.UserLogin.ForgotPasswordOTP"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.UserLogin.ForgotPasswordCheck"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.UserLogin.OTPVerification"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.UserLogin.Register"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.UserLogin.Login"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.UserLogin.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.ManageListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.PictureActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.UpdateUserInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.AdminPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.SettingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.DetailMissionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.StatisticActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.HistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.MusicActivity"
+            android:exported="false" />
+        <activity
+            android:name=".View_Controller.Activity.UserActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

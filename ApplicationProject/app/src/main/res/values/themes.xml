@@ -1,9 +1,45 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.ApplicationProject" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <item name="colorPrimary">@color/lavender</item>
+        <item name="colorPrimaryVariant">@color/lavender</item>
+    </style>
+    
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_out</item>
     </style>
 
     <style name="Theme.ApplicationProject" parent="Base.Theme.ApplicationProject" />
+
+    <style name="MyApp" parent="Base.Theme.ApplicationProject">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    
+    <style name="modeSwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/caption2</item>
+        <item name="colorSwitchThumbNormal">#FFFFFF</item>
+        <item name="android:colorForeground">#FFFFFF</item>
+    </style>
+
+
+    <!-- Light mode -->
+
+    <style name="SRCEEN">
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="TEXT">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="BUTTON">
+        <item name="android:background">@color/lavender</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>

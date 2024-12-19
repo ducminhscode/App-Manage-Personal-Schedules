@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_background"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/editTextMultiLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập ghi chú"
+        android:textSize="18dp"
+        android:textColor="@color/black"
+        android:inputType="textMultiLine"
+        android:lines="6"
+        android:maxLines="10"
+        android:scrollbars="vertical"
+        android:gravity="top|start"
+        android:backgroundTint="@android:color/transparent"
+       />
+
+
+</LinearLayout>

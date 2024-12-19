@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".Register">
+    tools:context=".View_Controller.UserLogin.Register">
 
     <TextView
         android:layout_width="wrap_content"
@@ -32,7 +32,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/round_back_dark_blue5_15">
+        android:background="@drawable/round_back_dark_caption4_15">
 
         <ImageView
             android:id="@+id/usernameUserIcon"
@@ -68,7 +68,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/round_back_dark_blue5_15">
+        android:background="@drawable/round_back_dark_caption4_15">
 
         <ImageView
             android:id="@+id/emailEmailIcon"
@@ -105,7 +105,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/round_back_dark_blue5_15">
+        android:background="@drawable/round_back_dark_caption4_15">
 
         <ImageView
             android:id="@+id/mobileNumberPhoneIcon"
@@ -142,7 +142,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/round_back_dark_blue5_15">
+        android:background="@drawable/round_back_dark_caption4_15">
 
         <ImageView
             android:id="@+id/passwordLockIcon"
@@ -190,7 +190,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/round_back_dark_blue5_15">
+        android:background="@drawable/round_back_dark_caption4_15">
 
         <ImageView
             android:id="@+id/confirmPasswordLockIcon"
@@ -243,7 +243,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:button="@drawable/custom_checkbox"
-            android:buttonTint="@color/primary"
+            android:buttonTint="@color/caption2"
             android:text=" I agree to our"
             app:buttonTint="@null" />
 
@@ -253,7 +253,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="Privacy Policy"
-            android:textColor="@color/primary"
+            android:textColor="@color/caption2"
             android:textStyle="bold" />
 
         <TextView
@@ -268,7 +268,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="Terms of Service"
-            android:textColor="@color/primary"
+            android:textColor="@color/caption2"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -280,7 +280,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/round_back_primary_15"
+        android:background="@drawable/round_back_caption2_15"
         android:text="@string/sign_up"
         android:textAllCaps="false"
         android:textColor="#FFFFFF" />
@@ -304,7 +304,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="@string/sign_in"
-            android:textColor="@color/primary"
+            android:textColor="@color/caption2"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

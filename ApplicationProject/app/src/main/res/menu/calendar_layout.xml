@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/sapXep"
+        android:title="Order"
+        android:icon="@drawable/setting"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/Calendar_language"
+        android:title="Another Calendar"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/visible"
+        android:title="Visible"
+        android:icon="@drawable/down_arrow"
+        app:showAsAction="collapseActionView|ifRoom"/>
+</menu>

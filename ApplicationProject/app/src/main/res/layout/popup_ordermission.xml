@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dialog_background_2">
+
+    <TextView
+        android:padding="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="The Misions are sorted by"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radioButtonST"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Due date and time"/>
+
+        <RadioButton
+            android:id="@+id/radioButtonL_B"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Task creation time(Latest at bottom)"/>
+
+        <RadioButton
+            android:id="@+id/radioButtonL_T"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Task creation time(Latest at top)"/>
+
+        <RadioButton
+            android:id="@+id/radioButtonA_Z"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alphabet A-Z"/>
+
+        <RadioButton
+            android:id="@+id/radioButtonZ_A"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alphabet Z-A"/>
+
+
+    </RadioGroup>
+
+</LinearLayout>

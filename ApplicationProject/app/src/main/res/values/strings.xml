@@ -1,7 +1,30 @@
 <resources>
-    <string name="app_name">ApplicationProject</string>
+    <string name="app_name">ToDo</string>
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign In</string>
-    <string name="web_client_id">666234794614-k7gun4ks9k4r8vlhk7mf819en95ktujs.apps.googleusercontent.com</string>
+    <string name="web_client_id">885749277570-67hh8i9fuib75hius3is42m5vgila4iq.apps.googleusercontent.com</string>
+    <string name="fab_des">Add a new item</string>
+    <string name="mission">Mission</string>
+    <string name="calendar">Calendar</string>
+    <string name="me">Me</string>
+    <string name="slogan1">To Do List</string>
+    <string name="slogan2">Let\'s make it happen</string>
+    <string name="premium">Premium</string>
+    <string name="star_task">Star Task</string>
+    <string name="themeplate">Themes</string>
+    <string name="utilities">Utilities</string>
+    <string name="response">Response</string>
+    <string name="setting">Setting</string>
+    <string name="signout">Log out</string>
+    <string name="open_nav">Open Navigation Drawer</string>
+    <string name="close_nav">Close Navigation Drawer</string>
+    <string name="month">Tháng</string>
+    <string name="past">Trước</string>
+    <string name="today">Hôm nay</string>
+    <string name="future">Tương lai</string>
+    <string name="complete">Hoàn thành</string>
+    <string name="check_mission">Kiểm tra tất cả các nhiệm vụ đã hoàn thành</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

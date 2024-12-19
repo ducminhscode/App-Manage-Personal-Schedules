@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".OTPVerification">
+    tools:context=".View_Controller.UserLogin.OTPVerification">
 
     <ImageView
         android:id="@+id/backToRegister"
@@ -47,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textColor="#CC000000"
+        android:textColor="@color/caption1"
         android:textSize="16sp"
         android:textStyle="bold"
         android:text="test@gmail.com"/>
@@ -66,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textColor="#CC000000"
+        android:textColor="@color/caption1"
         android:textSize="16sp"
         android:textStyle="bold"
         android:text="1234567890"/>
@@ -183,7 +182,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/round_back_primary_15"
+        android:background="@drawable/round_back_caption2_15"
         android:text="Verify"
         android:textAllCaps="false"
         android:textColor="#FFFFFF" />
@@ -207,7 +206,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="Resend Code"
-            android:textColor="@color/primary"
+            android:textColor="@color/caption2"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

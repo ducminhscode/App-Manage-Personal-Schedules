@@ -8,6 +8,33 @@
     <color name="teal_700">#FF018786</color>"
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
+    <color name="lavender">#8692F7</color>
+    <color name="gray">#353434</color>
+    <color name="grey">#D8DCDF</color>
     <color name="primary">#01AED8</color>
+    <color name="secondary">#FF03DAC5</color>
+    <color name="silver">#808080</color>
+
+    <color name="night_mode">#6124B1</color>
+    <color name="sign_in">#06D7A0</color>
+    <color name="private_account">#E6A326</color>
+    <color name="sign_out">#F04770</color>
+    <color name="red">#FF0000</color>
+
+
+    <color name="mission">#1194AA</color>
+    <color name="calendar">#AE7E0F</color>
+    <color name="me">#C9379D</color>
+
+    <color name="mission_20">#331194AA</color>
+    <color name="calendar_20">#33AE7E0F</color>
+    <color name="me_20">#33C9379D</color>
+
+    <color name="caption1">#4A628A</color>
+    <color name="caption2">#5C84A3</color>
+    <color name="caption3">#6D9FBD</color>
+    <color name="caption4">#7AB2D3</color>
+    <color name="caption5">#A6CCE4</color>
+    <color name="caption6">#CFE6F3</color>
+
 </resources>
