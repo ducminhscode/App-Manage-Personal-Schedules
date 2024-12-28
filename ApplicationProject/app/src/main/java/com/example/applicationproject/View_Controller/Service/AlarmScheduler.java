@@ -30,7 +30,7 @@ public class AlarmScheduler {
                 ReminderAlarmService.getReminderPendingIntent(context, reminderTask, idNotify);
 
 
-        pendingIntentMap.put( idNotify, operation);
+        pendingIntentMap.put(idNotify, operation);
 
         manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime, operation);
 

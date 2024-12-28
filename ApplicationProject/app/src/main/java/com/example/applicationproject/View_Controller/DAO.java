@@ -895,4 +895,17 @@ public class DAO {
             Toast.makeText(context, "Failed to update mission", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public static Cursor getAllMission(Context context, int id){
+        Uri newUri = Uri.withAppendedPath(ToDoDBContract.BASE_CONTENT_URI, ToDoDBContract.PATH_MISSIONS);
+        String selection = ToDoDBContract.MissionEntry.MISSION_ID + " = ? ";
+        String[] selectionArgs = { String.valueOf(id) };
+        return context.getContentResolver().query(newUri, selectionArgs, selection, null, null);
+    }
+
+    public static Cursor getAllRingToneList(Context context){
+        Uri newUri = Uri.withAppendedPath(ToDoDBContract.BASE_CONTENT_URI, ToDoDBContract.PATH_RINGTONES);
+        return context.getContentResolver().query(newUri, null, null, null, null);
+    }
+
 }

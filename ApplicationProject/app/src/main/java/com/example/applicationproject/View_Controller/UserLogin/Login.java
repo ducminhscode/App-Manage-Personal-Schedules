@@ -237,13 +237,11 @@ public class Login extends AppCompatActivity {
                 if (!DAO.checkEmailExists(this,personEmail) && !DAO.checkUsernameExists(this,personName)) {
                     Log.e("userid", "onActivityResult: "  + personName + personEmail);
                     if (!DAO.hasUsers(this)) {
-                        ToDoDBHelper credb = new ToDoDBHelper(this);
                         DAO.addUser(Login.this,personName, personEmail, null, null, "admin");
                         Log.e("userid", "onActivityResult: "  + personName + personEmail + "admin");
                         int userID = DAO.getUserId(this, personName);
                         DAO.insertCategory(this, "Không có thể loại", userID);
                     } else {
-                        ToDoDBHelper credb = new ToDoDBHelper(Login.this);
                         DAO.addUser(this,personName, personEmail, null, null, "user");
                         Log.e("userid", "onActivityResult: "  + personName + personEmail + "user");
                         int userID = DAO.getUserId(this, personName);

@@ -57,7 +57,7 @@ public class FouroundService extends Service {
     @SuppressLint("ForegroundServiceType")
     private void sendNotification(String title, String content) {
         Intent intent = new Intent(this, MeFragment.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         @SuppressLint("RemoteViewLayout") RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.custom_notifycation_layout);
         remoteViews.setOnClickPendingIntent(R.id.imageButton_notify, getPendingIntent());
         Notification notification = new NotificationCompat.Builder(this, CHANEL_ID)

@@ -289,7 +289,7 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
         }
         if (mcategoryList != null) {
             mcategoryList = mcategoryList.stream().filter(category -> category.getUser_id() == user).collect(Collectors.toList());
-            Log.e("checkcolumn1", "onLoadFinished: categoyList" + mcategoryList.get(0).getCategory_name());
+//            Log.e("checkcolumn1", "onLoadFinished: categoyList" + mcategoryList.get(0).getCategory_name());
         } else {
             mcategoryList = new ArrayList<>();
         }

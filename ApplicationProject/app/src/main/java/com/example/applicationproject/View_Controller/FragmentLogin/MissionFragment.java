@@ -176,7 +176,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         View view = inflater.inflate(R.layout.fragment_mission, container, false);
         Intent intent = requireActivity().getIntent();
         currentUser = intent.getStringExtra("name");
-        Log.e("onCreateView:1", currentUser);
+        Log.e("onCreateView:1", currentUser  + " ");
         password = intent.getStringExtra("password");
         user = DAO.getUserId(this.requireContext(), currentUser);
         Log.e("onCreateView:2", String.valueOf(user));
@@ -203,17 +203,16 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         }
 
         List<Mission> missions = new ArrayList<>();
-        missions.add(new Mission(1, 1, "2025-12-29", "Complete the project report", "true", "true", "daily", 1, "19:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2025-11-28", "Complete the project report", "true", "true", "daily", 2, "10:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2025-10-27", "Complete the project report", "true", "true", "daily", 3, "11:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2025-09-26", "Complete the project report", "true", "true", "daily", 4, "02:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2025-07-25", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2025-06-28", "Complete the project report", "true", "true", "daily", 6, "13:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "29/12/2025", "Complete the project report", "true", "true", "daily", 1, "19:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "28/11/2025", "Complete the project report", "true", "true", "daily", 2, "10:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "27/10/2025", "Complete the project report", "true", "true", "daily", 3, "11:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "26/09/2025", "Complete the project report", "true", "true", "daily", 4, "02:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "25/07/2025", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "28/06/2025", "Complete the project report", "true", "true", "daily", 6, "13:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
         missionAdapter.setMissionList(missions);
 
-        for (Mission mission : missions){
-            setalarm(mission.getTime(), mission.getDate(), mission.getMission_id(), mission.getReminderType(), Integer.parseInt(mission.getRepeatNo()), 1);
-        }
+        Notification notifycation = new Notification(1, "18:05", 1, "28/12/2024");
+        setalarm(notifycation.getTime(), notifycation.getDate(), notifycation.getMission_id(), "Không", 0, notifycation.getMission_id());
 
 //        shareDataDialogs.getMainList().observe(getViewLifecycleOwner(), missions -> {
 //            if (missions != null){
