@@ -419,11 +419,6 @@ public class DAO {
             return false;
         }
 
-        if (ringtone_path == null || ringtone_path.isEmpty()) {
-            Toast.makeText(context, "Ringtone path cannot be empty", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
         // Tạo đối tượng ContentValues để lưu trữ các giá trị sẽ chèn vào cơ sở dữ liệu
         ContentValues values = new ContentValues();
         values.put(ToDoDBContract.RingtoneEntry.RINGTONE_TITLE, ringtone_title);

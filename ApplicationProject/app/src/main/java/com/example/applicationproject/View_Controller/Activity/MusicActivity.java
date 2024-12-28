@@ -48,6 +48,7 @@ public class MusicActivity extends AppCompatActivity implements RingToneAdapter.
     private ImageButton btnBack;
     private ShareDataMission shareDataDialogs;
     private List<Ringtone> ringslist;
+    private static final int EXISTING_RINGTONES_LOADER = 2;
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -55,20 +56,10 @@ public class MusicActivity extends AppCompatActivity implements RingToneAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_rings);
         initWiget();
-        shareDataDialogs = new ViewModelProvider(this).get(ShareDataMission.class);
-        shareDataDialogs.getRingtoneList().observe(this, ringtoneList -> {
-            if (ringtoneList != null) {
-                ringslist.clear();
-                ringslist.addAll(ringtoneList);
-            }else{
-                ringslist.clear();
-            }
-        });
-
+        getSupportLoaderManager().initLoader(EXISTING_RINGTONES_LOADER, null, this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         recyclerViewGetRingsFromDV.setLayoutManager(layoutManager);
         adapter = new RingToneAdapter(this, this);
-        adapter.notifyDataSetChanged();
         recyclerViewGetRingsFromDV.setAdapter(adapter);
         btnBack.setOnClickListener(v -> finish());
         layoutGetRingsFromAudio.setOnClickListener(v -> {
@@ -161,11 +152,11 @@ public class MusicActivity extends AppCompatActivity implements RingToneAdapter.
                 if (DAO.checkRingtone(this, path)){
                     Toast.makeText(this, "Ringtone already exists", Toast.LENGTH_SHORT).show();
                 }else{
-                    boolean check = DAO.insertRingtone(this, path, name);
+                    boolean check = DAO.insertRingtone(this, name, path);
                     if (check) {
-                        int id = DAO.getStickerId(this, path);
+                        int id = DAO.getRingtoneId(this, path);
                         if (id != -1) {
-                            ringslist.add(new Ringtone(id, path, name));
+                            ringslist.add(new Ringtone(id, name, path));
                             adapter.notifyDataSetChanged();
                             Toast.makeText(this, "Insert Success", Toast.LENGTH_SHORT).show();
                         }
@@ -178,8 +169,9 @@ public class MusicActivity extends AppCompatActivity implements RingToneAdapter.
 
     @SuppressLint("IntentReset")
     private void extracted() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("audio/*");
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("audio/*");  // You can set this to specific types, e.g., audio, image, etc.
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(intent, MY_RINGS);
 //        if (intent.resolveActivity(getPackageManager()) != null) {
 //            startActivityForResult(intent, MY_RINGS);
@@ -202,12 +194,10 @@ public class MusicActivity extends AppCompatActivity implements RingToneAdapter.
                     }else{
                         boolean check = DAO.insertRingtone(this, audio.getPath(), audio.toString());
                         if (check) {
-                            int id = DAO.getStickerId(this, audio.toString());
+                            int id = DAO.getRingtoneId(this, audio.toString());
                             if (id != -1) {
-                                ringslist.add(new Ringtone(id, audio.toString(), audio.toString()));
+                                ringslist.add(new Ringtone(id, audio.getPath(), audio.toString()));
                                 adapter.notifyDataSetChanged();
-                                adapter.notifyItemInserted(ringslist.size() - 1);
-                                shareDataDialogs.setRingtoneList(ringslist);
                                 Toast.makeText(this, "Insert Success", Toast.LENGTH_SHORT).show();
                             }else{
                                 Toast.makeText(this, "Insert Fail", Toast.LENGTH_SHORT).show();
@@ -222,12 +212,16 @@ public class MusicActivity extends AppCompatActivity implements RingToneAdapter.
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        String[] projection3 = {
-                ToDoDBContract.RingtoneEntry.RINGTONE_ID,
-                ToDoDBContract.RingtoneEntry.RINGTONE_TITLE,
-                ToDoDBContract.RingtoneEntry.RINGTONE_PATH
-        };
-        return new CursorLoader(this, ToDoDBContract.RingtoneEntry.CONTENT_URI, projection3, null, null, null);
+        if (id == EXISTING_RINGTONES_LOADER) {
+            String[] projection3 = {
+                    ToDoDBContract.RingtoneEntry.RINGTONE_ID,
+                    ToDoDBContract.RingtoneEntry.RINGTONE_TITLE,
+                    ToDoDBContract.RingtoneEntry.RINGTONE_PATH
+            };
+            return new CursorLoader(this, ToDoDBContract.RingtoneEntry.CONTENT_URI, projection3, null, null, null);
+        }else{
+            return null;
+        }
     }
 
     @Override

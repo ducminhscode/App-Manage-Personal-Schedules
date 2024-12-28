@@ -50,7 +50,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.applicationproject.Application.MyApplication;
 import com.example.applicationproject.Database.ToDoDBContract;
 import com.example.applicationproject.Database.ToDoDBHelper;
 import com.example.applicationproject.Model.Category;
@@ -78,18 +77,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.Collectors;
 
 /**
@@ -201,19 +202,31 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             localDate = LocalDate.now();
         }
 
-        mainList = new ArrayList<>();
-        shareDataDialogs.getMainList().observe(getViewLifecycleOwner(), missions -> {
-            if (missions != null){
-                mainList.clear();
-                mainList.addAll(missions);
-                missionAdapter.setMissionList(mainList);
-                missionAdapter.notifyDataSetChanged();
-            }else{
-                mainList.clear();
-                missionAdapter.setMissionList(mainList);
-                missionAdapter.notifyDataSetChanged();
-            }
-        });
+        List<Mission> missions = new ArrayList<>();
+        missions.add(new Mission(1, 1, "2025-12-29", "Complete the project report", "true", "true", "daily", 1, "19:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "2025-11-28", "Complete the project report", "true", "true", "daily", 2, "10:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "2025-10-27", "Complete the project report", "true", "true", "daily", 3, "11:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "2025-09-26", "Complete the project report", "true", "true", "daily", 4, "02:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "2025-07-25", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "2025-06-28", "Complete the project report", "true", "true", "daily", 6, "13:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
+        missionAdapter.setMissionList(missions);
+
+        for (Mission mission : missions){
+            setalarm(mission.getTime(), mission.getDate(), mission.getMission_id(), mission.getReminderType(), Integer.parseInt(mission.getRepeatNo()), 1);
+        }
+
+//        shareDataDialogs.getMainList().observe(getViewLifecycleOwner(), missions -> {
+//            if (missions != null){
+//                mainList.clear();
+//                mainList.addAll(missions);
+//                missionAdapter.setMissionList(mainList);
+//                missionAdapter.notifyDataSetChanged();
+//            }else{
+//                mainList.clear();
+//                missionAdapter.setMissionList(mainList);
+//                missionAdapter.notifyDataSetChanged();
+//            }
+//        });
 
 //        shareDataDialogs.getMainList().observe(getViewLifecycleOwner(), missions -> {
 //            missionAdapter.setMissionList(missions);
@@ -232,6 +245,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             @Override
             public void onClick(View view) {
                 // xét dữ liệu mặc định
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    shareDataDialogs.setDataDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                }
                 shareDataDialogs.setDataTime("Không");
                 shareDataDialogs.setDataNotice("Không");
                 shareDataDialogs.setDataRepeatBool(0);
@@ -439,7 +455,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
         shareDataDialogs.getDataCategory().observe(getViewLifecycleOwner(), data -> {
             if (data != null){
-                btnChoseCategory.setText(categories.stream().anyMatch(category -> category.getCategory_id() == data) ? categories.stream().filter(category -> category.getCategory_id() == data).findFirst().get().getCategory_name() : "Không thể loại");
+                btnChoseCategory.setText(categories.stream().anyMatch(category -> category.getCategory_id() == data) ? categories.stream().filter(category -> category.getCategory_id() == data).findFirst().get().getCategory_name() : "Không có thể loại");
             }
         });
 
@@ -747,27 +763,32 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         });
         itemCategoryAdapter.setCategoryList(categoryList);
         recyclerView.setAdapter(itemCategoryAdapter);
-
-        // Xử lý sự kiện nhấp vào item trong RecyclerView
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-                // Nếu nhấp vào item, đóng dialog
-
-                dialog.dismiss();
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-                // Không cần xử lý gì ở đây
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-                // Không sử dụng ở đây
+        shareDataDialogs.getDataCategory().observe(getViewLifecycleOwner(), data -> {
+            if (data != null){
+                itemCategoryAdapter.setChosingbyId(data);
             }
         });
+
+        // Xử lý sự kiện nhấp vào item trong RecyclerView
+//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+//            @Override
+//            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//                // Nếu nhấp vào item, đóng dialog
+//
+//                dialog.dismiss();
+//                return false;
+//            }
+//
+//            @Override
+//            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//                // Không cần xử lý gì ở đây
+//            }
+//
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//                // Không sử dụng ở đây
+//            }
+//        });
         // Xử lý sự kiện nút "Thêm nhiều"
         LinearLayout btnAddMore = dialog.findViewById(R.id.btn_addMore);
         btnAddMore.setOnClickListener(view -> {
@@ -787,7 +808,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         final Dialog dialog = new Dialog(requireContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.fragment_mission_add_calendar);
-
         dialog.show();
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -804,31 +824,61 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         LinearLayout layoutRepeat = dialog.findViewById(R.id.layoutRepeat);
         DatePicker datePicker = dialog.findViewById(R.id.datePicker);
 
-        shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), data -> {
-            if (data != null && !data.equals("Không")){
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    LocalDate lDate = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    datePicker.updateDate(lDate.getYear(), lDate.getMonthValue() - 1, lDate.getDayOfMonth());
-                }
-            }
-        });
+//        shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), data -> {
+//            if (data != null && !data.equals("Không")){
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                    LocalDate lDate = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+//                    datePicker.updateDate(lDate.getYear(), lDate.getMonthValue() - 1, lDate.getDayOfMonth());
+//                }
+//            }
+//        });
 
-        datePicker.setOnClickListener(view -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                LocalDate localdate = LocalDate.of(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-                if (localdate.isAfter(localDate) || localdate.isEqual(localDate)){
-                    shareDataDialogs.setDataDate(localdate.format(formatter));
-                    layoutTime.setClickable(true);
-                }else{
-                    Toast.makeText(requireContext(), "Ngày không hợp lệ", Toast.LENGTH_SHORT).show();
-                    layoutTime.setClickable(false);
-                    shareDataDialogs.setDataTime("Không");
-                    shareDataDialogs.setDataDate("Không");
-                }
-            }
+//        datePicker.setOnClickListener(view -> {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//                LocalDate localdate = LocalDate.of(datePicker.getYear(), datePicker.getMonth() - 1, datePicker.getDayOfMonth());
+//                if (localdate.isAfter(localDate) || localdate.isEqual(localDate)){
+//                    shareDataDialogs.setDataDate(localdate.format(formatter));
+//                    layoutTime.setClickable(true);
+//                    Log.e("chosing calendar", "showBottomDialogCalendar: Valid" + localdate.format(formatter));
+//                }
+//                if(localdate.isBefore(localDate)){
+//                    layoutTime.setClickable(false);
+//                    shareDataDialogs.setDataTime("Không");
+//                    Log.e("chosing calendar", "showBottomDialogCalendar: Novalid" + localdate.format(formatter));
+//                }
+//            }
+//        });
 
-        });
+        datePicker.init(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth(),
+                new DatePicker.OnDateChangedListener() {
+                    @Override
+                    public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                            LocalDate localdate = LocalDate.of(year, monthOfYear + 1, dayOfMonth);
+                            if (localdate.isAfter(localDate) || localdate.isEqual(localDate)){
+                                shareDataDialogs.setDataDate(localdate.format(formatter));
+                                layoutTime.setClickable(true);
+                                Log.e("chosing calendar", "showBottomDialogCalendar: Valid" + localdate.format(formatter));
+                            }
+                            if(localdate.isBefore(localDate)){
+                                layoutTime.setClickable(false);
+                                shareDataDialogs.setDataTime("Không");
+                                Log.e("chosing calendar", "showBottomDialogCalendar: Novalid" + localdate.format(formatter));
+                            }
+                        }
+                    }
+                });
+
+//        shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), data -> {
+//            if (data != null && !data.equals("Không")){
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                    LocalDate localdate = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+//                    datePicker.updateDate(localdate.getYear(), localdate.getMonthValue() - 1, localdate.getDayOfMonth());
+//                }
+//            }
+//        });
 
         shareDataDialogs.getDataTime().observe(getViewLifecycleOwner(), data -> {
             TextView textViewTime = dialog.findViewById(R.id.textViewTime);
@@ -866,6 +916,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         layoutTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("layoutTime", "layoutTime Click");
                 showBottomDialogTimePicker();
             }
         });
@@ -873,6 +924,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         layoutNotice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("layoutNotice", "layoutNotice Click");
                 showBottomDialogNotification();
             }
         });
@@ -880,6 +932,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         layoutRepeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("layoutRepeat", "layoutRepeat Click");
                 showBottomDialogRepeat();
             }
         });
@@ -887,6 +940,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         layoutRemind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("layoutRemind", "layoutRemind Click");
                 showBottomDialogReminder();
             }
         });
@@ -1019,7 +1073,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         timePicker.setIs24HourView(true);
 
         shareDataDialogs.getDataTime().observe(getViewLifecycleOwner(), data -> {
-            if (data != null && !data.equals("Không")) {
+            if (!data.equals("Không")) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                     LocalTime localTime = LocalTime.parse(data, DateTimeFormatter.ofPattern("H:mm"));
                     timePicker.setHour(localTime.getHour());
@@ -1027,17 +1081,66 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 }
             }
         });
-        shareDataDialogs.getDataTimeHour().observe(getViewLifecycleOwner(), data -> {
-            if (data != null){
-                timePicker.setHour(data);
-            }
-        });
+//        shareDataDialogs.getDataTimeHour().observe(getViewLifecycleOwner(), data -> {
+//            if (data != null){
+//                timePicker.setHour(data);
+//            }
+//        });
+//
+//        shareDataDialogs.getDataTimeMinute().observe(getViewLifecycleOwner(), data -> {
+//            if (data != null){
+//                timePicker.setMinute(data);
+//            }
+//        });
 
-        shareDataDialogs.getDataTimeMinute().observe(getViewLifecycleOwner(), data -> {
-            if (data != null){
-                timePicker.setMinute(data);
-            }
-        });
+//        timePicker.setOnTimeChangedListener((timePicker1, hourChange, minuteChange) -> {
+//            ok.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), data -> {
+//                            if (!data.equals("Không")){
+//                                LocalDate localDate1 = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+//                                LocalTime localTime = LocalTime.now();
+//                                LocalTime localTime1;
+//                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
+//                                if (minuteChange < 10){
+//                                    localTime1 = LocalTime.parse(hourChange + ":" + "0" + minuteChange, formatter);
+//                                }else{
+//                                    localTime1 = LocalTime.parse(hourChange + ":" + minuteChange, formatter);
+//                                }
+//                                if (localDate1.equals(localDate)){
+//                                    if (localTime1.isAfter(localTime)){
+//                                        shareDataDialogs.setDataTime(String.valueOf(localTime1));
+//                                        shareDataDialogs.setDataTimeHour(hourChange);
+//                                        shareDataDialogs.setDataTimeMinute(minuteChange);
+//                                        dialog.dismiss();
+//                                    }else{
+//                                        Toast.makeText(requireContext(), "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show();
+//                                        shareDataDialogs.setDataTime("Không");
+//                                        shareDataDialogs.setDataTimeHour(0);
+//                                        shareDataDialogs.setDataTimeMinute(0);
+//                                        dialog.dismiss();
+//                                    }
+//                                }else if (localDate1.isAfter(localDate)){
+//                                    shareDataDialogs.setDataTime(String.valueOf(localTime1));
+//                                    shareDataDialogs.setDataTimeHour(hourChange);
+//                                    shareDataDialogs.setDataTimeMinute(minuteChange);
+//                                    dialog.dismiss();
+//                                }else{
+//                                    Toast.makeText(requireContext(), "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show();
+//                                    shareDataDialogs.setDataTime("Không");
+//                                    shareDataDialogs.setDataTimeHour(0);
+//                                    shareDataDialogs.setDataTimeMinute(0);
+//                                    dialog.dismiss();
+//                                }
+//                            }
+//                        });
+//
+//                    }
+//                }
+//            });
+//        });
 
         timePicker.setOnTimeChangedListener((timePicker1, hourChange, minuteChange) -> {
             ok.setOnClickListener(new View.OnClickListener() {
@@ -1045,37 +1148,49 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 public void onClick(View view) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), data -> {
-                            if (!data.equals("Không")){
+                            if (!data.equals("Không")) {
+                                // Convert the selected date string to LocalDate
                                 LocalDate localDate1 = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                                if (localDate1.equals(localDate)){
-                                    LocalTime localTime = LocalTime.now();
-                                    LocalTime localTime1;
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
-                                    if (minuteChange < 10){
-                                        localTime1 = LocalTime.parse(hourChange + ":" + "0" + minuteChange, formatter);
-                                    }else{
-                                        localTime1 = LocalTime.parse(hourChange + ":" + minuteChange, formatter);
-                                    }
-                                    if (localTime1.isAfter(localTime)){
-                                        shareDataDialogs.setDataTime(String.valueOf(localTime1));
-                                        shareDataDialogs.setDataTimeHour(hourChange);
-                                        shareDataDialogs.setDataTimeMinute(minuteChange);
-                                        dialog.dismiss();
-                                    }else{
-                                        Toast.makeText(requireContext(), "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show();
-                                        shareDataDialogs.setDataTime("Không");
-                                        shareDataDialogs.setDataTimeHour(0);
-                                        shareDataDialogs.setDataTimeMinute(0);
-                                        dialog.dismiss();
-                                    }
+
+                                // Get current date and time
+                                LocalDate localDate = LocalDate.now();
+                                LocalTime localTimeNow = LocalTime.now(); // Time right now
+
+                                // Format the time from the TimePicker
+                                LocalTime localTime1;
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
+                                if (minuteChange < 10) {
+                                    localTime1 = LocalTime.parse(hourChange + ":" + "0" + minuteChange, formatter);
+                                } else {
+                                    localTime1 = LocalTime.parse(hourChange + ":" + minuteChange, formatter);
+                                }
+
+                                // Combine the date and time into LocalDateTime for comparison
+                                LocalDateTime dateTimeNow = LocalDateTime.of(localDate, localTimeNow);
+                                LocalDateTime selectedDateTime = LocalDateTime.of(localDate1, localTime1);
+
+                                // Compare the selected time with the current time
+                                if (selectedDateTime.isAfter(dateTimeNow)) {
+                                    // Valid selection
+                                    shareDataDialogs.setDataTime(String.valueOf(localTime1));
+                                    shareDataDialogs.setDataTimeHour(hourChange);
+                                    shareDataDialogs.setDataTimeMinute(minuteChange);
+                                    dialog.dismiss();
+                                } else {
+                                    // Invalid time selection
+                                    Toast.makeText(requireContext(), "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show();
+                                    shareDataDialogs.setDataTime("Không");
+                                    shareDataDialogs.setDataTimeHour(0);
+                                    shareDataDialogs.setDataTimeMinute(0);
+                                    dialog.dismiss();
                                 }
                             }
                         });
-
                     }
                 }
             });
         });
+
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1203,22 +1318,29 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
         List<String> list = new ArrayList<>();
         shareDataDialogs.getDatareminders().observe(getViewLifecycleOwner(), reminders -> {
-            if (reminders != null){
+            Log.e("reminders", "reminders size: " + (reminders != null ? reminders.size() : "null"));
+            if (reminders != null && !reminders.isEmpty()) {
+                Log.e("reminders", "reminders: " + reminders.getClass().getName());
                 list.clear();
-                list.addAll(reminders);
-            }else{
-                list.clear();
+                Log.e("reminders", "Before adding, list size: " + list.size());
+                for (String reminder : reminders){
+                    Log.e("reminder", "reminder: " + reminder);
+                    list.add(reminder);
+                }
+                Log.e("reminders", "After adding, list size: " + list.size());
+            } else {
+                Log.e("reminders", "No data to add");
             }
         });
 
         List<NotificationTemp> list1 = new ArrayList<>();
         shareDataDialogs.getDataNotificationTemp().observe(getViewLifecycleOwner(), notificationList1 -> {
+            Log.e("notificationList1", "notificationList1: " + notificationList1.size());
             if (notificationList1 != null){
                 list1.clear();
                 list1.addAll(notificationList1);
-            }else{
-                list1.clear();
             }
+            Log.e("notificationList1", "showBottomDialogNotification: " + list1.size());
         });
 
         AtomicReference<String> day = new AtomicReference<>();
@@ -1266,22 +1388,29 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             }
         });
 
+        AtomicBoolean rd5mAgoCheck = new AtomicBoolean(rd5mAgo.isChecked());
+        Log.e("rd5mAgoCheck", "rd5mAgoCheck: " + rd5mAgoCheck);
         rd5mAgo.setOnClickListener(view -> {
-            if (rd5mAgo.isChecked()){
+            if (rd5mAgoCheck.get()) {
                 rd5mAgo.setChecked(false);
+                rd5mAgoCheck.set(false);
                 shareDataDialogs.getReminder2().observe(getViewLifecycleOwner(), data -> {
+                    Log.e("Reminder2 Data", "Data received: " + data);
                     if (!data.isEmpty()){
                         String time1 = data.split(" ")[1];
                         list.remove(data);
+                        shareDataDialogs.setDatareminders(list);
                         NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
                         list1.remove(notificationTemp);
+                        shareDataDialogs.setDataNotificationTemp(list1);
                         shareDataDialogs.setReminder2("");
                     }else{
                         shareDataDialogs.setReminder2("");
                     }
                 });
-            }else{
+            } else {
                 rd5mAgo.setChecked(true);
+                rd5mAgoCheck.set(true);
                 if (minute.get() >= 5){
                     minute.set(minute.get() - 5);
                 }else{
@@ -1295,11 +1424,58 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                     s = hour.get() + ":" + minute.get();
                 }
                 list.add(day.get() + " " + s);
+                Log.e("list", "Datareminders: " + list.size());
+                shareDataDialogs.setDatareminders(list);
                 NotificationTemp notificationTemp = new NotificationTemp(day.get(), s);
                 list1.add(notificationTemp);
+                Log.e("list1", "DataNotificationTemp: " + list1.size());
+                shareDataDialogs.setDataNotificationTemp(list1);
                 shareDataDialogs.setReminder2(day.get() + " " + s);
+                Log.e("list", "Datareminders: " + Objects.requireNonNull(shareDataDialogs.getDatareminders().getValue()).size());
+                Log.e("list1", "DataNotificationTemp: " + Objects.requireNonNull(shareDataDialogs.getDataNotificationTemp().getValue()).size());
             }
         });
+
+        Log.e("DataNotificationTemp1", "DataNotificationTemp: " + list1.size());
+        Log.e("setDatareminders0", "setDatareminders: " + list.size());
+
+
+//        rd5mAgo.setOnClickListener(view ->{
+//            if (rd5mAgo.isChecked()){
+//                rd5mAgo.setChecked(false);
+
+//                shareDataDialogs.getReminder2().observe(getViewLifecycleOwner(), data -> {
+//                    Log.e("Reminder2 Data", "Data received: " + data);
+//                    if (!data.isEmpty()){
+//                        String time1 = data.split(" ")[1];
+//                        list.remove(data);
+//                        NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+//                        list1.remove(notificationTemp);
+//                        shareDataDialogs.setReminder2("");
+//                    }else{
+//                        shareDataDialogs.setReminder2("");
+//                    }
+//                });
+//            }else{
+//                rd5mAgo.setChecked(true);
+//                if (minute.get() >= 5){
+//                    minute.set(minute.get() - 5);
+//                }else{
+//                    hour.set(hour.get() - 1);
+//                    minute.set(60 + minute.get() - 5);
+//                }
+//                String s;
+//                if (minute.get() < 10){
+//                    s = hour.get() + ":" + "0" + minute.get();
+//                }else{
+//                    s = hour.get() + ":" + minute.get();
+//                }
+//                list.add(day.get() + " " + s);
+//                NotificationTemp notificationTemp = new NotificationTemp(day.get(), s);
+//                list1.add(notificationTemp);
+//                shareDataDialogs.setReminder2(day.get() + " " + s);
+//            }
+//        });
 
         rd10mAgo.setOnClickListener(view -> {
             if (rd10mAgo.isChecked()){
@@ -1336,6 +1512,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             if (rd15mAgo.isChecked()){
                 rd15mAgo.setChecked(false);
                 shareDataDialogs.getReminder4().observe(getViewLifecycleOwner(), data -> {
+                    Log.e("rd15mAgo", "rd15mAgo: " + data);
                     String time1 = data.split(" ")[1];
                     list.remove(data);
                     NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
@@ -1440,12 +1617,13 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             }
         });
 
+        Log.e("list", "Datareminders: " + shareDataDialogs.getDatareminders().getValue());
+
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shareDataDialogs.setDatareminders(list);
-                shareDataDialogs.setDataNotificationTemp(list1);
                 shareDataDialogs.getDatareminders().observe(getViewLifecycleOwner(), data -> {
+                    Log.e("list", "Datareminders: " + data);
                     if (data.isEmpty()){
                         dialog.dismiss();
                     }else{
@@ -1819,52 +1997,52 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             default:
                 return;
         }
-        if (mcategoryList != null && !mcategoryList.isEmpty()) {
-            mcategoryList = mcategoryList.stream().filter(category -> category.getUser_id() == user).collect(Collectors.toList());
-        } else {
-            mcategoryList = new ArrayList<>();
-            shareDataDialogs.setDataCategory(-1);
-        }
-        shareDataDialogs.setCategoryList(mcategoryList);
-        if (missionList != null) {
-            List<Mission> mainList = new ArrayList<>();
-            for (Category category : mcategoryList) {
-                mainList.addAll(missionList.stream().filter(mission -> category.getCategory_id() == mission.getCategory_id()).collect(Collectors.toList()));
-            }
-            shareDataDialogs.setMainList(mainList);
-            Log.e("checkcolumn2", "onLoadFinished: " + mainList.size());
-        } else {
-            List<Mission> mainList = new ArrayList<>();
-            shareDataDialogs.setMainList(mainList);
-        }
-        if (stickerList != null) {
-            shareDataDialogs.setStickerList(stickerList);
-            Log.e("checkcolumn3", "onLoadFinished: " + stickerList.size());
-        }else{
-            stickerList = new ArrayList<>();
-            shareDataDialogs.setStickerList(stickerList);
-        }
-        if (ringtoneList != null) {
-            shareDataDialogs.setRingtoneList(ringtoneList);
-            Log.e("checkcolumn4", "onLoadFinished: " + ringtoneList.size());
-        }else {
-            ringtoneList = new ArrayList<>();
-            shareDataDialogs.setRingtoneList(ringtoneList);
-        }
-        if (taskbesideList != null) {
-            shareDataDialogs.setTaskbesideList(taskbesideList);
-            Log.e("checkcolumn5", "onLoadFinished: " + taskbesideList.size());
-        }else{
-            taskbesideList = new ArrayList<>();
-            shareDataDialogs.setTaskbesideList(taskbesideList);
-        }
-        if (notificationList != null) {
-            shareDataDialogs.setNotificationList(notificationList);
-            Log.e("checkcolumn6", "onLoadFinished: " + notificationList.size());
-        }else {
-            notificationList = new ArrayList<>();
-            shareDataDialogs.setNotificationList(notificationList);
-        }
+//        if (mcategoryList != null && !mcategoryList.isEmpty()) {
+//            mcategoryList = mcategoryList.stream().filter(category -> category.getUser_id() == user).collect(Collectors.toList());
+//        } else {
+//            mcategoryList = new ArrayList<>();
+//            shareDataDialogs.setDataCategory(-1);
+//        }
+//        shareDataDialogs.setCategoryList(mcategoryList);
+//        if (missionList != null) {
+//            List<Mission> mainList = new ArrayList<>();
+//            for (Category category : mcategoryList) {
+//                mainList.addAll(missionList.stream().filter(mission -> category.getCategory_id() == mission.getCategory_id()).collect(Collectors.toList()));
+//            }
+//            shareDataDialogs.setMainList(mainList);
+//            Log.e("checkcolumn2", "onLoadFinished: " + mainList.size());
+//        } else {
+//            List<Mission> mainList = new ArrayList<>();
+//            shareDataDialogs.setMainList(mainList);
+//        }
+//        if (stickerList != null) {
+//            shareDataDialogs.setStickerList(stickerList);
+//            Log.e("checkcolumn3", "onLoadFinished: " + stickerList.size());
+//        }else{
+//            stickerList = new ArrayList<>();
+//            shareDataDialogs.setStickerList(stickerList);
+//        }
+//        if (ringtoneList != null) {
+//            shareDataDialogs.setRingtoneList(ringtoneList);
+//            Log.e("checkcolumn4", "onLoadFinished: " + ringtoneList.size());
+//        }else {
+//            ringtoneList = new ArrayList<>();
+//            shareDataDialogs.setRingtoneList(ringtoneList);
+//        }
+//        if (taskbesideList != null) {
+//            shareDataDialogs.setTaskbesideList(taskbesideList);
+//            Log.e("checkcolumn5", "onLoadFinished: " + taskbesideList.size());
+//        }else{
+//            taskbesideList = new ArrayList<>();
+//            shareDataDialogs.setTaskbesideList(taskbesideList);
+//        }
+//        if (notificationList != null) {
+//            shareDataDialogs.setNotificationList(notificationList);
+//            Log.e("checkcolumn6", "onLoadFinished: " + notificationList.size());
+//        }else {
+//            notificationList = new ArrayList<>();
+//            shareDataDialogs.setNotificationList(notificationList);
+//        }
     }
 
     @Override

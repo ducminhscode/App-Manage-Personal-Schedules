@@ -101,6 +101,10 @@ public class ItemCategoryAdapter extends RecyclerView.Adapter<ItemCategoryAdapte
         notifyItemChanged(selectionItem);
     }
 
+    public void setChosingbyId(int id){
+        this.selectionItem = categoryList.indexOf(categoryList.stream().filter(category -> category.getCategory_id() == id).findFirst().orElse(categoryList.get(0)));
+    }
+
     @Override
     public int getItemCount() {
         if (categoryList == null) {

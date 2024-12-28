@@ -1,5 +1,7 @@
 package com.example.applicationproject.View_Controller.FragmentLogin;
 
+import static androidx.core.app.ActivityCompat.recreate;
+
 import android.app.Dialog;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -40,6 +42,7 @@ import com.example.applicationproject.View_Controller.ShareDataMission;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -129,6 +132,7 @@ public class CalendarFragment extends Fragment {
         calendarAdapter = new MissionAdapter(requireContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false);
         rVC.setLayoutManager(linearLayoutManager);
+        mainList = new ArrayList<>();
         shareDataMission.getMainList().observe(getViewLifecycleOwner(), missons -> {
             if (missons != null) {
                 mainList.clear();
@@ -242,44 +246,41 @@ public class CalendarFragment extends Fragment {
             if (i == radioButton1.getId()) {
                 setLocale("vi");
                 shareDataMission.setDataChangeLanguage(1);
-                updateCalendarView();
             }else if (i == radioButton2.getId()){
                 setLocale("en");
-                updateCalendarView();
                 shareDataMission.setDataChangeLanguage(2);
             }else if (i == radioButton3.getId()){
                 setLocale("ja");
-                updateCalendarView();
                 shareDataMission.setDataChangeLanguage(3);
             }else if (i == radioButton4.getId()){
                 setLocale("zh");
-                updateCalendarView();
                 shareDataMission.setDataChangeLanguage(4);
             }else if (i == radioButton5.getId()){
                 setLocale("ko");
-                updateCalendarView();
                 shareDataMission.setDataChangeLanguage(5);
             }
-        });
-
-        radioGroup.setOnClickListener(view -> {
             dialog.dismiss();
         });
-
     }
 
-    private void updateCalendarView() {
-        // Reset CalendarView để cập nhật các thay đổi ngôn ngữ
-        calendarView.setVisibility(View.GONE); // Ẩn CalendarView
-        calendarView.setVisibility(View.VISIBLE); // Hiện lại CalendarView
-    }
 
     private void setLocale(String languageCode) {
+        // Đặt Locale cho ứng dụng
         Locale locale = new Locale(languageCode);
         Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.setLocale(locale);
+
+        // Cập nhật lại cấu hình ứng dụng với locale mới (dành cho Android 7.0 trở lên)
+        android.content.res.Configuration config = getResources().getConfiguration();
+        config.setLocale(locale); // Dùng setLocale thay vì cập nhật config.locale trực tiếp
         getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+
+        // Làm mới lại CalendarView
+        // Bạn có thể gọi lại activity để làm mới giao diện
+        recreate(requireActivity()); // Đây sẽ làm cho activity được tái tạo và áp dụng cấu hình mới
+
+        // Hoặc nếu bạn không muốn recreate toàn bộ Activity, có thể ẩn và hiện lại CalendarView
+        calendarView.setVisibility(View.GONE);
+        calendarView.setVisibility(View.VISIBLE);
     }
 
     private void showdialogOrder() {
@@ -312,6 +313,12 @@ public class CalendarFragment extends Fragment {
                 radioButton5.setChecked(true);
             }
         });
+
+        if (mainList == null) {
+            mainList = new ArrayList<>();
+        }else{
+            mainList = new ArrayList<>();
+        }
 
         radioGroup.setOnCheckedChangeListener((radioGroup1, i) -> {
             if (i == radioButton1.getId()) {
@@ -355,6 +362,7 @@ public class CalendarFragment extends Fragment {
                 mainList.sort(Comparator.comparing(Mission::getTitle).reversed());
                 shareDataMission.setDataOrdering(5);
             }
+            dialog.dismiss();
         });
 
         radioGroup.setOnClickListener(view -> {

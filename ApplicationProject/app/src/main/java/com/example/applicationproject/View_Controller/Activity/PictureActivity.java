@@ -69,7 +69,7 @@ public class PictureActivity extends AppCompatActivity implements LoaderManager.
         getSupportLoaderManager().initLoader(EXISTING_STICKERS_LOADER, null, this);
         shareDataMission = new ViewModelProvider(this).get(ShareDataMission.class);
         btnBack.setOnClickListener(v -> finish());
-        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerViewImages.setLayoutManager(layoutManager);
         pictureAdapter = new StickerAdminAdapter(this);
         recyclerViewImages.setAdapter(pictureAdapter);
@@ -159,7 +159,7 @@ public class PictureActivity extends AppCompatActivity implements LoaderManager.
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
                 .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
-                .setPermissions(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+                .setPermissions(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.CAMERA)
                 .check();
     }
 

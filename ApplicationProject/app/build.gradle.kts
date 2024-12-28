@@ -75,4 +75,7 @@ dependencies {
     implementation("io.github.ParkSangGwon:tedimagepicker:1.6.1")
     implementation("io.github.ParkSangGwon:tedpermission-normal:3.4.2")
 
+    //Load image
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 }
