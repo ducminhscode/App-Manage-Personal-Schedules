@@ -18,7 +18,8 @@
         <EditText
             android:id="@+id/editText_taskBeside"
             android:layout_width="297dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="text"/>
 
         <ImageButton
             android:id="@+id/imageButton_taskBeside"

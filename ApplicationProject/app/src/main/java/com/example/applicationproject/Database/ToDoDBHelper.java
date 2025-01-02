@@ -49,7 +49,7 @@ public class ToDoDBHelper extends SQLiteOpenHelper {
                 + " TEXT, " + ToDoDBContract.MissionEntry.MISSION_TIME + " TEXT, " + ToDoDBContract.MissionEntry.MISSION_isREPEAT + " TEXT, " +
                 ToDoDBContract.MissionEntry.MISSION_DESCRIPTION + " TEXT, " + ToDoDBContract.MissionEntry.MISSION_isNOTIFY
                 + " TEXT, " + ToDoDBContract.MissionEntry.MISSION_REPEAT_NO
-                + " TEXT, " + ToDoDBContract.MissionEntry.MISSION_REMINDER + " TEXT, " + ToDoDBContract.MissionEntry.MISSION_REPEAT_TYPE + " TEXT, "
+                + " TEXT, " + ToDoDBContract.MissionEntry.MISSION_REPEAT_TYPE + " TEXT, "
                 + ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE + " TEXT, "
                 + ToDoDBContract.MissionEntry.MISSION_RINGTONE_ID + " INTEGER, "
                 + ToDoDBContract.MissionEntry.MISSION_CATEGORY_ID + " INTEGER, "

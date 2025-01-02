@@ -63,11 +63,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class DetailMissionActivity extends AppCompatActivity implements ItemCategoryAdapter.OnClickItemCategoryItem, StickerAdapter.OnClickStickerListener, TaskBesideAdapter.OnClickItemTaskBeside, RingToneUserAdapter.OnClickItemRingtone {
 
     private ItemCategoryAdapter itemCategoryAdapter;
     private int id;
+    private String userName;
     private ShareDataMission shareDataDialogs;
     private Button btn;
     private ImageButton imagBack, imagSticker, imgSave;
@@ -76,94 +78,93 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
     private LinearLayout layOutNV, layOutTime, layOutNotify, layOutRepeat, layOutNote;
     private TextView tvDate, tvTime, tvRepeat;
     private LocalDate localDate;
+    private TaskBesideAdapter taskBesideAdapter;
     private static final long milHour = 3600000L;
     private static final long milDay = 86400000L;
     private static final long milWeek = 604800000L;
     private static final long milMonth = 2592000000L;
+    private Mission missionMain;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             localDate = LocalDate.now();
         }
-        shareDataDialogs = new ViewModelProvider(this).get(ShareDataMission.class);
+        shareDataDialogs = MissionFragment.shareDataDialogs;
         int id_mission = getIntent().getIntExtra("id_mission", 0);
+        userName = getIntent().getStringExtra("name_user");
         if (id_mission != 0) {
             id = id_mission;
-            List<Mission> missionList = new ArrayList<>();
-            shareDataDialogs.getMainList().observe(this, missions -> {
-                if(missions != null){
-                    missionList.clear();
-                    missionList.addAll(missions);
-                }else{
-                    missionList.clear();
-                }
-            });
-            List<Taskbeside> taskbesideList = new ArrayList<>();
-            shareDataDialogs.getTaskbesideList().observe(this, taskbesides -> {
-                if (taskbesides != null) {
-                    taskbesideList.clear();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        taskbesideList.addAll(taskbesides.stream().filter(v -> v.getMission_id() == id).toList());
-                    }
-                } else {
-                    taskbesideList.clear();
-                }
-            });
-            List<Notification> notificationList = new ArrayList<>();
-            shareDataDialogs.getNotificationList().observe(this, notifications -> {
-                if (notifications != null) {
-                    notificationList.clear();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        notificationList.addAll(notifications.stream().filter(v -> v.getMission_id() == id).toList());
-                    }
-                } else {
-                    notificationList.clear();
-                }
-            });
-            List<Ringtone> ringtoneList = new ArrayList<>();
-            shareDataDialogs.getRingtoneList().observe(this, ring -> {
-                if (ring != null) {
-                    ringtoneList.clear();
-                    ringtoneList.addAll(ring);
-                } else {
-                    ringtoneList.clear();
-                }
-            });
-            List<Category> categoryList = new ArrayList<>();
-            shareDataDialogs.getCategoryList().observe(this, categories -> {
-                if (categories != null) {
-                    categoryList.clear();
-                    categoryList.addAll(categories);
-                } else {
-                    categoryList.clear();
-                }
-            });
-            List<Sticker> St = new ArrayList<>();
-            shareDataDialogs.getStickerList().observe(this, stickers -> {
-                if (stickers != null) {
-                    St.clear();
-                    St.addAll(stickers);
-                } else {
-                    St.clear();
-                }
-            });
-            shareDataDialogs.setDataCategory(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getCategory_id());
-            shareDataDialogs.setDataTime(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getTime());
-            if (notificationList.isEmpty()){
+            List<Mission> missionList = shareDataDialogs.getMainList().getValue();
+            if (missionList == null) {
+                missionList = new ArrayList<>();
+            }
+            missionMain = missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get();
+            List<Taskbeside> taskbesideList = shareDataDialogs.getTaskbesideList().getValue();
+            if (taskbesideList == null) {
+                taskbesideList = new ArrayList<>();
+            }else{
+                taskbesideList = taskbesideList.stream().filter(v -> v.getMission_id() == id).collect(Collectors.toList());
+            }
+            shareDataDialogs.setTaskbesideList(taskbesideList);
+            List<Notification> notificationList = shareDataDialogs.getNotificationList().getValue();
+            if (notificationList == null) {
+                notificationList = new ArrayList<>();
+            }else{
+                notificationList = notificationList.stream().filter(v -> v.getMission_id() == id).collect(Collectors.toList());
+            }
+            shareDataDialogs.setNotificationList(notificationList);
+            List<Ringtone> ringtoneList = shareDataDialogs.getRingtoneList().getValue();
+            if (ringtoneList == null) {
+                ringtoneList = new ArrayList<>();
+            }
+            List<Category> categoryList = shareDataDialogs.getCategoryList().getValue();
+            if (categoryList == null) {
+                categoryList = new ArrayList<>();
+            }
+            List<Sticker> St = shareDataDialogs.getStickerList().getValue();
+            if (St == null) {
+                St = new ArrayList<>();
+            }
+            shareDataDialogs.setDataCategory(missionMain.getCategory_id());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                shareDataDialogs.setDataTime(missionMain.getTime());
+            }
+            if (shareDataDialogs.getNotificationList().getValue().isEmpty()){
                 shareDataDialogs.setDataNotice("Không");
             }else{
-                String s = "";
-                for (Notification notification : notificationList) {
-                    s = s + notification.getDate() + notification.getTime() + " ";
+                List<String> list = new ArrayList<>();
+                String[] s = {""};
+                List<NotificationTemp> list1 = new ArrayList<>();
+                for (Notification notification : shareDataDialogs.getNotificationList().getValue()) {
+                    list1.add(new NotificationTemp(notification.getDate(), notification.getTime()));
+                    list.add(notification.getDate() + " " + notification.getTime());
+                    s[0] = s[0] + notification.getDate() + " " + notification.getTime() + ",";
                 }
-                shareDataDialogs.setDataNotice(s);
+                shareDataDialogs.setDataNotificationTemp(list1);
+                shareDataDialogs.setDatareminders(list);
+                shareDataDialogs.setDataNotice(s[0]);
             }
-            shareDataDialogs.setDataRepeatBool(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getReminderType() == "Không" ? 0 : 1);
-            shareDataDialogs.setDataRepeat(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().isRepeat());
-            shareDataDialogs.setDataRepeatNo(Integer.valueOf(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getRepeatNo()));
-            shareDataDialogs.setDataRepeatType(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getReminderType());
+            if (missionMain.isRepeat().equals("False")){
+                shareDataDialogs.setDataRepeat("Không");
+            }else{
+                String count = missionMain.getRepeatNo();
+                String type = missionMain.getReminderType();
+                if (count.equals("Không")){
+                    shareDataDialogs.setDataRepeat("Không");
+                    shareDataDialogs.setDataRepeatNo(0);
+                }else if (type.equals("Không")){
+                    shareDataDialogs.setDataRepeat("Không");
+                    shareDataDialogs.setDataRepeatType("Không");
+                }else{
+                    shareDataDialogs.setDataRepeatNo(Integer.valueOf(count));
+                    shareDataDialogs.setDataRepeatType(type);
+                    shareDataDialogs.setDataRepeat("Mỗi" + " " + count + " " + type + "(s)");
+                }
+            }
+
             shareDataDialogs.setReminder("");
             shareDataDialogs.setReminder2("");
             shareDataDialogs.setReminder3("");
@@ -171,25 +172,37 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
             shareDataDialogs.setReminder5("");
             shareDataDialogs.setReminder6("");
             shareDataDialogs.setReminder7("");
-            if (notificationList.isEmpty()){
-                shareDataDialogs.setReminder("");
-                shareDataDialogs.setReminder2("");
-                shareDataDialogs.setReminder3("");
-                shareDataDialogs.setReminder4("");
-                shareDataDialogs.setReminder5("");
-                shareDataDialogs.setReminder6("");
-                shareDataDialogs.setReminder7("");
-            }else{
-                for (Notification notification : notificationList) {
+
+            if (!shareDataDialogs.getNotificationList().getValue().isEmpty()){
+                for (Notification notification : shareDataDialogs.getNotificationList().getValue()) {
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                         LocalDate date = LocalDate.parse(notification.getDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                         LocalTime time = LocalTime.parse(notification.getTime(), DateTimeFormatter.ofPattern("H:mm"));
-                        LocalTime localTime = LocalTime.now();
+                        LocalDate dateSelected = LocalDate.parse(missionMain.getDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        LocalTime timeSelected = LocalTime.parse(missionMain.getTime(), DateTimeFormatter.ofPattern("H:mm"));
                         int hour = time.getHour();
                         int minute = time.getMinute();
-                        if (date.equals(localDate)){
-                            if (hour == localTime.getHour()){
-                                switch (minute - localTime.getMinute()){
+                        if (date.equals(dateSelected)){
+                            if (hour == timeSelected.getHour()){
+                                switch (minute - timeSelected.getMinute()){
+                                    case 0:
+                                        shareDataDialogs.setReminder(date + " " + time);
+                                        break;
+                                    case 5:
+                                        shareDataDialogs.setReminder2(date + " " + time);
+                                        break;
+                                    case 10:
+                                        shareDataDialogs.setReminder3(date + " " + time);
+                                        break;
+                                    case 15:
+                                        shareDataDialogs.setReminder4(date + " " + time);
+                                        break;
+                                    case 30:
+                                        shareDataDialogs.setReminder5(date + " " + time);
+                                        break;
+                                }
+                            }else{
+                                switch (60 + timeSelected.getMinute() - minute){
                                     case 0:
                                         shareDataDialogs.setReminder(date + " " + time);
                                         break;
@@ -208,31 +221,22 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                                 }
                             }
                         }else{
-                            switch (date.getDayOfMonth() - localDate.getDayOfMonth()){
-                                case 1:
-                                    shareDataDialogs.setReminder6(date+ " " + time);
-                                    break;
-                                case 2:
-                                    shareDataDialogs.setReminder7(date + " " + time);
-                                    break;
+                            if (date.minusDays(1).equals(dateSelected)){
+                                shareDataDialogs.setReminder6(date + " " + time);
+                            }
+                            if (date.minusDays(2).equals(dateSelected)){
+                                shareDataDialogs.setReminder7(date + " " + time);
                             }
                         }
                     }
                 }
             }
-            shareDataDialogs.setDataSticker(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getSticker_id());
-            shareDataDialogs.setDataRingTone(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getRingTone_id());
+            shareDataDialogs.setDataSticker(missionMain.getSticker_id());
+            shareDataDialogs.setDataRingTone(missionMain.getRingTone_id());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalTime localTime = LocalTime.parse(missionList.stream().filter(mission -> mission.getMission_id() == id).findFirst().get().getTime(), DateTimeFormatter.ofPattern("H:mm"));
+                LocalTime localTime = LocalTime.parse(missionMain.getTime(), DateTimeFormatter.ofPattern("H:mm"));
                 shareDataDialogs.setDataTimeHour(localTime.getHour());
                 shareDataDialogs.setDataTimeMinute(localTime.getMinute());
-            }
-            List<String> list = new ArrayList<>();
-            if (!notificationList.isEmpty()){
-                for (Notification notification : notificationList) {
-                    list.clear();
-                    list.add(notification.getDate() + " " + notification.getTime());
-                }
             }
 
             List<TaskString> taskStringList = new ArrayList<>();
@@ -241,53 +245,51 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                     taskStringList.add(new TaskString(taskbeside.getName()));
                 }
             }
+
             shareDataDialogs.setDatataskBesideList(taskStringList);
-            shareDataDialogs.setDatareminders(list);
-            shareDataDialogs.setDataRemindType(missionList.stream().filter(w -> w.getMission_id() == id).findFirst().get().getReminderType());
-            shareDataDialogs.setDecription(missionList.stream().filter(w -> w.getMission_id() == id).findFirst().get().getDescribe());
-            shareDataDialogs.setTitle(missionList.stream().filter(w -> w.getMission_id() == id).findFirst().get().getTitle());
-            List<NotificationTemp> notificationTemps = new ArrayList<>();
-            if (!notificationList.isEmpty()){
-                for (Notification notification : notificationList) {
-                    notificationTemps.add(new NotificationTemp(notification.getDate(), notification.getTime()));
-                }
-            }
-            shareDataDialogs.setDataNotificationTemp(notificationTemps);
+            shareDataDialogs.setDataRemindType(missionMain.getReminderType());
+            shareDataDialogs.setDecription(missionMain.getDescribe() == null ? "" : missionMain.getDescribe());
+            shareDataDialogs.setTitle(missionMain.getTitle());
 
             initwiget();
 
             shareDataDialogs.getDataCategory().observe(this, data -> {
                 if (data != null){
-                    btn.setText(categoryList.stream().filter(category -> category.getCategory_id() == data).findFirst().get().getCategory_name());
+                    btn.setText(data);
+                }else{
+                    btn.setText("Category");
                 }
             });
 
             shareDataDialogs.getDataSticker().observe(this, data -> {
                 if (data != null){
-                    imagSticker.setImageURI(Uri.parse(St.stream().filter(sticker -> sticker.getSticker_id() == data).findFirst().get().getSticker_path()));
+                    imagSticker.setImageURI(Uri.parse(shareDataDialogs.getStickerList().getValue().stream().filter(sticker -> sticker.getSticker_id() == data).findFirst().get().getSticker_path()));
                 }
             });
 
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(layoutManager);
+            taskBesideAdapter = new TaskBesideAdapter(this, this);
+            recyclerView.setAdapter(taskBesideAdapter);
+
             shareDataDialogs.getDatataskBesideList().observe(this, data -> {
                 if (data != null){
+                    taskBesideAdapter.setTaskBesideList(data);
                     recyclerView.setVisibility(View.VISIBLE);
                 }else {
                     recyclerView.setVisibility(View.GONE);
                 }
             });
 
+
             layOutNV.setOnClickListener(view -> {
                 TaskString taskString = new TaskString("");
-                taskStringList.add(taskString);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-                recyclerView.setAdapter(new TaskBesideAdapter(taskStringList, this));
-                if (taskStringList.isEmpty()){
-                    recyclerView.setVisibility(View.GONE);
-                    shareDataDialogs.setDatataskBesideList(taskStringList);
-                }else{
-                    recyclerView.setVisibility(View.VISIBLE);
-                    shareDataDialogs.setDatataskBesideList(taskStringList);
+                List<TaskString> list = shareDataDialogs.getDatataskBesideList().getValue();
+                if (list == null){
+                    list = new ArrayList<>();
                 }
+                list.add(taskString);
+                shareDataDialogs.setDatataskBesideList(list);
             });
 
             layOutNote.setOnClickListener(view -> {
@@ -329,8 +331,7 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                 shareDataDialogs.getDataRingTone().observe(this, ringTone_id::set);
                 AtomicReference<String> date = new AtomicReference<>();
                 shareDataDialogs.getDataDate().observe(this, date::set);
-                AtomicReference<String> describe = new AtomicReference<>();
-                shareDataDialogs.getDecription().observe(this, describe::set);
+                String describe = shareDataDialogs.getDecription().getValue();
                 AtomicReference<String> isNotify = new AtomicReference<>();
                 shareDataDialogs.getDataNotice().observe(this, data -> {
                     if (data.equals("Không")){
@@ -340,60 +341,53 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                     }
                 });
                 AtomicReference<String> isRepeat = new AtomicReference<>();
-                shareDataDialogs.getDataRepeatBool().observe(this, data -> {
-                    if (data == 1){
-                        isRepeat.set("True");
-                    }else{
+                shareDataDialogs.getDataRepeat().observe(this, data -> {
+                    if (data.equals("Không")){
                         isRepeat.set("False");
+                    }else{
+                        isRepeat.set("True");
                     }
                 });
                 AtomicReference<String> repeatType = new AtomicReference<>();
                 shareDataDialogs.getDataRepeatType().observe(this, repeatType::set);
                 AtomicReference<String> time = new AtomicReference<>();
                 shareDataDialogs.getDataTime().observe(this, time::set);
-                AtomicReference<String> editext = new AtomicReference<>();
-                shareDataDialogs.getTitle().observe(this, data -> {
-                    if (data != null){
-                        editext.set(data);
-                    }else{
-                        editext.set("");
-                    }
-                });
-                String title = editext.get();
+                String title = ediText.getText().toString();
                 AtomicInteger category_id = new AtomicInteger();
                 shareDataDialogs.getDataCategory().observe(this, category_id::set);
                 AtomicReference<String> repeatNo = new AtomicReference<>();
                 shareDataDialogs.getDataRepeatNo().observe(this, data -> {
-                    repeatNo.set(String.valueOf(data));
+                    if (data == 0){
+                        repeatNo.set("Không");
+                    }else{
+                        repeatNo.set(data.toString());
+                    }
                 });
-                String reminder;
-                if (isNotify.get().equals("True")){
-                    reminder = "True";
-                }else{
-                    reminder = "False";
-                }
                 AtomicReference<String> reminderType = new AtomicReference<>();
                 shareDataDialogs.getDataRemindType().observe(this, reminderType::set);
                 String isSticker;
-                if (sticker_id.get() == 1){
-                    isSticker = "True";
-                }else{
+                if (sticker_id.get() == 0){
                     isSticker = "False";
+                }else{
+                    isSticker = "True";
                 }
-                String isActive = "On";
+                String isActive = missionMain.getIsActive();
 
                 if (date.get().equals("Không")){
-                    finish();
+                    Toast.makeText(this, "Ngày không hợp lệ", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 else if (time.get().equals("Không")) {
-                    finish();
+                    Toast.makeText(this, "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                else if (editext.get().isEmpty()){
-                    finish();
+                else if (title.isEmpty()){
+                    Toast.makeText(this, "Tiêu đề không hợp lệ", Toast.LENGTH_SHORT).show();
+                    return;
                 }else{
-                    boolean check = DAO.updateMission(this, sticker_id.get(), ringTone_id.get(), date.get(), describe.get(),
+                    boolean check = DAO.updateMission(this, sticker_id.get(), ringTone_id.get(), date.get(), describe,
                             isNotify.get(), isRepeat.get(), repeatType.get(), time.get(), title,
-                            category_id.get(), repeatNo.get(), reminder, reminderType.get(), isSticker, isActive, id);
+                            category_id.get(), repeatNo.get(), reminderType.get(), isSticker, isActive, id);
                     if (check){
                         AtomicReference<String> retype = new AtomicReference<>();
                         shareDataDialogs.getDataRemindType().observe(this, retype::set);
@@ -401,21 +395,16 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                         AtomicInteger reNo = new AtomicInteger();
                         shareDataDialogs.getDataRepeatNo().observe(this, reNo::set);
 
-                        List<NotificationTemp> notificationNewTemps = new ArrayList<>();
-                        shareDataDialogs.getDataNotificationTemp().observe(this, data -> {
-                            if (data != null){
-                                notificationNewTemps.clear();
-                                notificationNewTemps.addAll(data);
-                            }else {
-                                notificationNewTemps.clear();
-                            }
-                        });
+                        List<NotificationTemp> notificationNewTemps = shareDataDialogs.getDataNotificationTemp().getValue();
+                        if (notificationNewTemps == null){
+                            notificationNewTemps = new ArrayList<>();
+                        }
                         if (notificationNewTemps.isEmpty()){
                             Toast.makeText(this, "Không có lời nhắc nào!!", Toast.LENGTH_SHORT).show();
                         }else{
-                            for (Notification notification : notificationList){
+                            for (Notification notification : shareDataDialogs.getNotificationList().getValue()){
                                 boolean checked = DAO.deleteNotification(this, notification.getNotification_id());
-                                new AlarmScheduler().cancelAlarm(this, id, notification.getNotification_id());
+                                new AlarmScheduler().cancelAlarm(this, id, notification.getNotification_id(), userName);
                                 if (!checked){
                                     Toast.makeText(this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
                                     finish();
@@ -427,12 +416,12 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                                 boolean checkNotification = DAO.insertNotification(this, notificationTemp.getTime(), notificationTemp.getDate(), id);
                                 if (!checkNotification){
                                     Toast.makeText(this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    return;
                                 }else{
                                     Toast.makeText(this, "Thêm thành công", Toast.LENGTH_SHORT).show();
-                                    if (DAO.findnotificationbyTimeDate(this, notificationTemp.getTime(), notificationTemp.getDate()) != -1){
+                                    if (DAO.findnotificationbyTimeDate(this, notificationTemp.getTime(), notificationTemp.getDate()) == -1){
                                         Toast.makeText(this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
-                                        finish();
+                                        return;
                                     }else{
                                         Toast.makeText(this, "Thêm thành công", Toast.LENGTH_SHORT).show();
                                         int id_notification = DAO.findnotificationbyTimeDate(this, notificationTemp.getTime(), notificationTemp.getDate());
@@ -442,32 +431,29 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                             }
                         }
 
-                        List<TaskString> taskbesides = new ArrayList<>();
-                        shareDataDialogs.getDatataskBesideList().observe(this, data -> {
-                            if (data != null){
-                                taskbesides.clear();
-                                taskbesides.addAll(data);
-                            }else {
-                                taskbesides.clear();
-                            }
-                        });
+                        List<TaskString> taskbesides = shareDataDialogs.getDatataskBesideList().getValue();
+                        if (taskbesides == null){
+                            taskbesides = new ArrayList<>();
+                        }
                         if (taskbesides.isEmpty()){
                             Toast.makeText(this, "Không có task beside nào!!", Toast.LENGTH_SHORT).show();
                         }else{
-                            for (Taskbeside taskbeside : taskbesideList){
-                                boolean checked = DAO.deleteTaskbeside(this, taskbeside.getTaskbeside_id());
-                                if (!checked){
-                                    Toast.makeText(this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }else{
-                                    Toast.makeText(this, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                            if (!shareDataDialogs.getTaskbesideList().getValue().isEmpty()){
+                                for (Taskbeside taskbeside : shareDataDialogs.getTaskbesideList().getValue()){
+                                    boolean checked = DAO.deleteTaskbeside(this, taskbeside.getTaskbeside_id());
+                                    if (!checked){
+                                        Toast.makeText(this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }else{
+                                        Toast.makeText(this, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
                             for (TaskString taskString : taskbesides) {
                                 boolean checkTaskBeside = DAO.insertTaskbeside(this, taskString.getTaskString(), id);
                                 if (!checkTaskBeside) {
                                     Toast.makeText(this, "Thêm thất bại", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    return;
                                 } else {
                                     Toast.makeText(this, "Thêm thành công", Toast.LENGTH_SHORT).show();
                                 }
@@ -477,17 +463,14 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                         finish();
                     }else{
                         Toast.makeText(this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
-                        finish();
+                        return;
                     }
                 }
-                finish();
             });
-
-
         }else{
             Toast.makeText(this, "Không có id", Toast.LENGTH_SHORT).show();
+            finish();
         }
-
     }
 
     private void setalarm(String time, String date, int mission_id, String type, int repeatNo, int notify_id){
@@ -504,7 +487,7 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
             long selectedTimestamp =  mCalender.getTimeInMillis();
 
             if (type.equals("Không")){
-                new AlarmScheduler().setAlarm(this, selectedTimestamp, mission_id, notify_id);
+                new AlarmScheduler().setAlarm(this, selectedTimestamp, mission_id, notify_id, userName);
                 Toast.makeText(this, "Đặt lời nhắc thành công" + selectedTimestamp, Toast.LENGTH_SHORT).show();
             }else{
                 if (type.equals("Giờ")){
@@ -516,7 +499,7 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                 }else{
                     mRepeat = repeatNo * milMonth;
                 }
-                new AlarmScheduler().setRepeatAlarm(this, selectedTimestamp, mission_id, mRepeat, notify_id);
+                new AlarmScheduler().setRepeatAlarm(this, selectedTimestamp, mission_id, mRepeat, notify_id, userName);
                 Toast.makeText(this, "Đặt lời nhắc thành công" + selectedTimestamp, Toast.LENGTH_SHORT).show();
             }
         }
@@ -542,7 +525,7 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
                 editText.setText("");
             }
         });
-        if (editText.getText() != null){
+        if (editText.getText()!= null && !editText.getText().toString().isEmpty()){
             shareDataDialogs.setDecription(editText.getText().toString());
         }else{
             shareDataDialogs.setDecription("");
@@ -580,24 +563,47 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
         // Khởi tạo RecyclerView và Adapter
         RecyclerView recyclerView = dialog.findViewById(R.id.listItem);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        List<Category> categoryList = new ArrayList<>();
+        itemCategoryAdapter = new ItemCategoryAdapter(this, this, true);
         shareDataDialogs.getCategoryList().observe(this, categories -> {
             if (categories != null){
-                categoryList.clear();
-                categoryList.addAll(categories);
+                itemCategoryAdapter.setCategoryList(categories);
             }else{
-                categoryList.clear();
+                itemCategoryAdapter.setCategoryList(new ArrayList<>());
             }
         });
-        itemCategoryAdapter = new ItemCategoryAdapter(this, this, true);
-        itemCategoryAdapter.setCategoryList(categoryList);
         recyclerView.setAdapter(itemCategoryAdapter);
+        shareDataDialogs.getDataCategory().observe(this, data -> {
+            if (data != null){
+                itemCategoryAdapter.setChosingbyId(data);
+            }
+        });
 
+        // Xử lý sự kiện nhấp vào item trong RecyclerView
+//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+//            @Override
+//            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//                // Nếu nhấp vào item, đóng dialog
+//
+//                dialog.dismiss();
+//                return false;
+//            }
+//
+//            @Override
+//            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//                // Không cần xử lý gì ở đây
+//            }
+//
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//                // Không sử dụng ở đây
+//            }
+//        });
         // Xử lý sự kiện nút "Thêm nhiều"
         LinearLayout btnAddMore = dialog.findViewById(R.id.btn_addMore);
         btnAddMore.setOnClickListener(view -> {
             // Mở Activity quản lý danh sách
             Intent intent = new Intent(this, ManageListActivity.class);
+            intent.putExtra("name", userName);
             startActivity(intent);
         });
     }
@@ -615,34 +621,32 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
 
         RecyclerView recyclerView = dialog.findViewById(R.id.listItem_stickers);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        List<Sticker> stickerList = new ArrayList<>();
+        StickerAdapter stickerAdapter = new StickerAdapter(this, this);
+        recyclerView.setAdapter(stickerAdapter);
         shareDataDialogs.getStickerList().observe(this, stickers -> {
             if (stickers != null){
-                stickerList.clear();
-                stickerList.addAll(stickers);
+                stickerAdapter.setStickerList(stickers);
             }else{
-                stickerList.clear();
+                stickerAdapter.setStickerList(new ArrayList<>());
             }
         });
-        StickerAdapter stickerAdapter = new StickerAdapter(this, stickerList, this);
-        recyclerView.setAdapter(stickerAdapter);
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-                dialog.dismiss();
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
+//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+//            @Override
+//            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//                dialog.dismiss();
+//                return false;
+//            }
+//
+//            @Override
+//            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//
+//            }
+//
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//
+//            }
+//        });
 
     }
 
@@ -1469,18 +1473,17 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
         });
 
         RecyclerView recyclerView = dialog.findViewById(R.id.listItem_music);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        List<Ringtone> ringtones = new ArrayList<>();
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        RingToneUserAdapter musicAdapter = new RingToneUserAdapter(DetailMissionActivity.this, this);
+        recyclerView.setAdapter(musicAdapter);
         shareDataDialogs.getRingtoneList().observe(this, ringtonelist -> {
             if (ringtonelist != null){
-                ringtones.clear();
-                ringtones.addAll(ringtonelist);
+                musicAdapter.setRingtoneList(ringtonelist);
             }else{
-                ringtones.clear();
+                musicAdapter.setRingtoneList(new ArrayList<>());
             }
         });
-        RingToneUserAdapter musicAdapter = new RingToneUserAdapter(DetailMissionActivity.this, ringtones, this);
-        recyclerView.setAdapter(musicAdapter);
 
         rdbtn_annoucement.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1529,8 +1532,14 @@ public class DetailMissionActivity extends AppCompatActivity implements ItemCate
     }
 
     @Override
-    public void onItemClick(int position) {
-
+    public void onItemClick(int position, String name) {
+        TaskString taskString = new TaskString(name);
+        List<TaskString> taskStringList = shareDataDialogs.getDatataskBesideList().getValue();
+        if (taskStringList == null){
+            taskStringList = new ArrayList<>();
+        }
+        taskStringList.remove(taskString);
+        shareDataDialogs.setDatataskBesideList(taskStringList);
     }
 
     @Override

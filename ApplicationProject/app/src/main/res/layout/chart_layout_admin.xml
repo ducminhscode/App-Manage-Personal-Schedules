@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,15 +83,14 @@
                     android:layout_height="wrap_content"
                     android:text="Tổng quan"/>
 
-
-                <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/linebar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/linebar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 

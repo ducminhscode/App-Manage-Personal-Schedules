@@ -30,10 +30,14 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.StickerV
     private int selectionItem = -1;
     private int oldposition = -1;
 
-    @SuppressLint("NotifyDataSetChanged")
-    public StickerAdapter(Context context, List<Sticker> stickerList, OnClickStickerListener onClickStickerListener) {
+
+    public StickerAdapter(Context context, OnClickStickerListener onClickStickerListener) {
         this.context = context;
         this.onClickStickerListener = onClickStickerListener;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setStickerList(List<Sticker> stickerList) {
         this.stickerList = stickerList;
         notifyDataSetChanged();
     }

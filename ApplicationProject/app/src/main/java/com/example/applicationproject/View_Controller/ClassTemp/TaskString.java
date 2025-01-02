@@ -7,6 +7,7 @@ public class TaskString {
         this.taskString = taskString;
     }
 
+
     public String getTaskString() {
         return taskString;
     }

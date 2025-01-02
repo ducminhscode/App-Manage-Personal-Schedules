@@ -91,7 +91,7 @@ public class CalendarGuestFragment extends Fragment {
         if (item.getItemId() == R.id.sapXep) {
             Toast.makeText(requireContext(), "Sắp xếp", Toast.LENGTH_SHORT).show();
             return true;
-        } else if (item.getItemId() == R.id.about) {
+        } else if (item.getItemId() == R.id.thongke) {
             Toast.makeText(requireContext(), "About", Toast.LENGTH_SHORT).show();
             return true;
         }else if(item.getItemId() == R.id.visible) {

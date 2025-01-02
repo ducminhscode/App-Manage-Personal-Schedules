@@ -37,6 +37,7 @@ public class MissionAdapter extends RecyclerView.Adapter<MissionAdapter.MissionV
     private List<Mission> missionList;
     private List<Mission> missionListOld;
     private ToDoDBHelper toDoDBHelper;
+    private String userId;
 
     public MissionAdapter(Context mContext) {
         this.mContext = mContext;
@@ -89,6 +90,7 @@ public class MissionAdapter extends RecyclerView.Adapter<MissionAdapter.MissionV
         holder.relativeLayout.setOnClickListener(view -> {
             Intent intent = new Intent(this.mContext, DetailMissionActivity.class);
             intent.putExtra("id_mission", mission.getMission_id());
+            intent.putExtra("name_user", userId);
             this.mContext.startActivity(intent);
         });
 
@@ -105,7 +107,9 @@ public class MissionAdapter extends RecyclerView.Adapter<MissionAdapter.MissionV
             Random random = new Random();
             int randomColor = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
             holder.letter.setTextColor(randomColor);
+            holder.letter.setText(letter);
             holder.type.setVisibility(View.GONE);
+            holder.cdItem.setVisibility(View.VISIBLE);
         }
         if (mission.getIsNotify().equals("True")) {
             holder.ringRing.setVisibility(View.VISIBLE);
@@ -120,7 +124,12 @@ public class MissionAdapter extends RecyclerView.Adapter<MissionAdapter.MissionV
         }else{
             holder.repeat.setVisibility(View.GONE);
         }
-        holder.describe.setText(mission.getDescribe());
+        if (mission.getDescribe() == null || mission.getDescribe().isEmpty()){
+            holder.describe.setVisibility(View.GONE);
+        }else{
+            holder.describe.setVisibility(View.VISIBLE);
+            holder.describe.setText(mission.getDescribe());
+        }
 
     }
 
@@ -158,7 +167,7 @@ public class MissionAdapter extends RecyclerView.Adapter<MissionAdapter.MissionV
                                 }
                                 break;
                             case "DateTime":
-                                if(mission.getDate().toLowerCase().contains(strSearch.toLowerCase())){
+                                if(mission.getDate().equals(strSearch)){
                                     list.add(mission);
                                 }
                                 break;
@@ -201,5 +210,9 @@ public class MissionAdapter extends RecyclerView.Adapter<MissionAdapter.MissionV
     public void restoreItem(Mission mission, int position) {
         missionList.add(position, mission);
         notifyItemInserted(position);
+    }
+
+    public void getUserId(String name){
+        userId = name;
     }
 }

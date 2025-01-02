@@ -27,9 +27,11 @@ import com.example.applicationproject.Model.User;
 import com.example.applicationproject.R;
 import com.example.applicationproject.View_Controller.DAO;
 import com.example.applicationproject.View_Controller.ShareDataMission;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -43,14 +45,13 @@ import java.util.stream.Collectors;
 
 public class StatisticActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private BarChart barChart;
     private ImageButton btn_back;
     private ImageView btn_left;
     private ImageView btn_right;
     private TextView tv_month;
-    private com.github.mikephil.charting.charts.LineChart linebar;
     private LocalDate date;
     private ShareDataMission shareDataMission;
-    private LineDataSet lineDataSet;
     private static final int EXISTING_MISIONS_LOADER = 0;
     private static final int EXISTING_CATEGORIES_LOADER = 1;
     private static final int EXISTING_USERS_LOADER = 2;
@@ -96,26 +97,18 @@ public class StatisticActivity extends AppCompatActivity implements LoaderManage
     @SuppressLint("SetTextI18n")
     private void handleLeftButtonClick() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (date.getMonthValue() == 1) {
-                return;
-            } else {
-                date = date.minusMonths(1);
-                tv_month.setText(date.getMonth().toString());
-                updateChartData(date); // Update the chart data for the previous month
-            }
+            date = date.minusMonths(1);
+            tv_month.setText(date.getMonth().toString());
+            updateChartData(date); // Update the chart data for the previous month
         }
     }
 
     @SuppressLint("SetTextI18n")
     private void handleRightButtonClick() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (date.getMonthValue() == 12) {
-                return;
-            } else {
-                date = date.plusMonths(1);
-                tv_month.setText(date.getMonth().toString());
-                updateChartData(date); // Update the chart data for the next month
-            }
+            date = date.plusMonths(1);
+            tv_month.setText(date.getMonth().toString());
+            updateChartData(date); // Update the chart data for the next month
         }
     }
 
@@ -139,18 +132,18 @@ public class StatisticActivity extends AppCompatActivity implements LoaderManage
 
     // Method to update chart data based on the given date
     private void updateChartData(LocalDate date) {
-        ArrayList<Entry> entries = new ArrayList<>();
+        List<BarEntry> entries = new ArrayList<>();
         List<User> users = new ArrayList<>();
         users.add(new User("0987654321", "user1@example.com", 1, "Nguyen Thi Lan", "password123", "user"));
         users.add(new User("0987654320", "user2@example.com", 2, "Nguyen Thi Mai", "password123", "user"));
         users.add(new User("0987654319", "user3@example.com", 3, "Nguyen Thi Hoa", "password123", "user"));
         List<Mission> missions = new ArrayList<>();
-        missions.add(new Mission(1, 1, "2024-12-29", "Complete the project report", "true", "true", "daily", 1, "09:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2024-11-29", "Complete the project report", "true", "true", "daily", 2, "09:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2024-10-29", "Complete the project report", "true", "true", "daily", 3, "09:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2024-09-29", "Complete the project report", "true", "true", "daily", 4, "09:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2024-07-29", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "2024-06-29", "Complete the project report", "true", "true", "daily", 6, "09:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
+        missions.add(new Mission(1, 1, "2024-12-29", "Complete the project report", "true", "true", "daily", 1, "09:00", "Morning meeting", 1, "5", "10 minutes before", "true", "On"));
+        missions.add(new Mission(1, 1, "2024-11-29", "Complete the project report", "true", "true", "daily", 2, "09:00", "Morning meeting", 1, "5", "10 minutes before", "true", "On"));
+        missions.add(new Mission(1, 1, "2024-10-29", "Complete the project report", "true", "true", "daily", 3, "09:00", "Morning meeting", 2, "5", "10 minutes before", "true", "On"));
+        missions.add(new Mission(1, 1, "2024-09-29", "Complete the project report", "true", "true", "daily", 4, "09:00", "Morning meeting", 2, "5", "10 minutes before", "true", "On"));
+        missions.add(new Mission(1, 1, "2024-07-29", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+        missions.add(new Mission(1, 1, "2024-06-29", "Complete the project report", "true", "true", "daily", 6, "09:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
         List<Category> categories = new ArrayList<>();
         categories.add(new Category(1, "Technology", 1));
         categories.add(new Category(2, "Math", 2));
@@ -187,7 +180,7 @@ public class StatisticActivity extends AppCompatActivity implements LoaderManage
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             Month dates = date.getMonth();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            if (linebar != null) {
+            if (barChart != null) {
                 for (User user : users) {
                     if (user != null) {
                         List<Category> categoryList = categories.stream()
@@ -199,21 +192,22 @@ public class StatisticActivity extends AppCompatActivity implements LoaderManage
                                 List<Mission> newones = missions.stream()
                                         .filter(w -> w.getCategory_id() == category.getCategory_id() && LocalDate.parse(w.getDate(), formatter).getMonth().equals(dates)).collect(Collectors.toList());
                                 Log.e("count", "updateChartData: " + user.getUser_id() + " " + newones.size());
-                                entries.add(new Entry(user.getUser_id(), newones.size()));
+                                entries.add(new BarEntry((float)user.getUser_id(),(float)newones.size()));
                             }
                         }
                     }
                 }
 
                 if (!entries.isEmpty()) {
-                    lineDataSet = new LineDataSet(entries, "User");
-                    lineDataSet.setColor(Color.BLUE);
-                    lineDataSet.setValueTextColor(Color.BLACK);
-                    lineDataSet.setValueTextSize(12f);
+                    BarDataSet lineDataSet = new BarDataSet(entries, "User");
+                    lineDataSet.setColors(ColorTemplate.COLORFUL_COLORS); // Set color for the slices
+                    lineDataSet.setValueTextSize(12f); // Set text size for values
+                    lineDataSet.setValueTextColor(android.graphics.Color.BLACK); // Set text color for values
 
-                    LineData lineData = new LineData(lineDataSet);
-                    linebar.setData(lineData);
-                    linebar.invalidate();
+
+                    BarData barData = new BarData(lineDataSet);
+                    barChart.setData(barData);
+                    barChart.invalidate();
                 }
             }
         }
@@ -226,7 +220,7 @@ public class StatisticActivity extends AppCompatActivity implements LoaderManage
         btn_left = findViewById(R.id.btn_left);
         btn_right = findViewById(R.id.btn_right);
         tv_month = findViewById(R.id.tv_month);
-        linebar = findViewById(R.id.linebar);
+        barChart = findViewById(R.id.linebar);
     }
 
     @NonNull
@@ -243,7 +237,6 @@ public class StatisticActivity extends AppCompatActivity implements LoaderManage
                         ToDoDBContract.MissionEntry.MISSION_isREPEAT,
                         ToDoDBContract.MissionEntry.MISSION_REPEAT_TYPE,
                         ToDoDBContract.MissionEntry.MISSION_REPEAT_NO,
-                        ToDoDBContract.MissionEntry.MISSION_REMINDER,
                         ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE,
                         ToDoDBContract.MissionEntry.MISSION_RINGTONE_ID,
                         ToDoDBContract.MissionEntry.MISSION_DESCRIPTION,
@@ -298,10 +291,9 @@ public class StatisticActivity extends AppCompatActivity implements LoaderManage
                         @SuppressLint("Range") String time = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TIME));
                         @SuppressLint("Range") String title = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TITLE));
                         @SuppressLint("Range") String repeatNo = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REPEAT_NO));
-                        @SuppressLint("Range") String reminder = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER));
                         @SuppressLint("Range") String reminderType = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE));
                         @SuppressLint("Range") String isActive = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_isACTIVE));
-                        Mission mission = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminder, reminderType, isSticker, isActive);
+                        Mission mission = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminderType, isSticker, isActive);
                         missionList.add(mission);
                     } while (data.moveToNext());
                 }

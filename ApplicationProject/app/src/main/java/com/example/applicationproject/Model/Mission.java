@@ -2,11 +2,11 @@ package com.example.applicationproject.Model;
 
 public class Mission {
     private int category_id, mission_id, ringTone_id, sticker_id;
-    private String title, date, time, describe, repeatType, isRepeat, isNotify, repeatNo, reminder, reminderType, isSticker, isActive;
+    private String title, date, time, describe, repeatType, isRepeat, isNotify, repeatNo, reminderType, isSticker, isActive;
 
     public Mission(int sticker_id, int ringTone_id, String date, String describe, String isNotify,
                    String isRepeat, String repeatType, int mission_id, String time, String title,
-                   int category_id, String repeatNo, String reminder, String reminderType, String isSticker, String isActive) {
+                   int category_id, String repeatNo, String reminderType, String isSticker, String isActive) {
         this.date = date;
         this.describe = describe;
         this.isNotify = isNotify;
@@ -17,7 +17,6 @@ public class Mission {
         this.title = title;
         this.category_id = category_id;
         this.repeatNo = repeatNo;
-        this.reminder = reminder;
         this.reminderType = reminderType;
         this.ringTone_id = ringTone_id;
         this.sticker_id = sticker_id;
@@ -63,14 +62,6 @@ public class Mission {
 
     public void setReminderType(String reminderType) {
         this.reminderType = reminderType;
-    }
-
-    public String getReminder() {
-        return reminder;
-    }
-
-    public void setReminder(String reminder) {
-        this.reminder = reminder;
     }
 
     public String getDate() {

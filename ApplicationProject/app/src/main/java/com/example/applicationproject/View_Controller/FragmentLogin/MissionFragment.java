@@ -4,8 +4,11 @@ package com.example.applicationproject.View_Controller.FragmentLogin;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -16,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,6 +30,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.IBinder;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -58,7 +63,9 @@ import com.example.applicationproject.Model.Notification;
 import com.example.applicationproject.Model.Ringtone;
 import com.example.applicationproject.Model.Sticker;
 import com.example.applicationproject.Model.Taskbeside;
+import com.example.applicationproject.View_Controller.Activity.HistoryActivity;
 import com.example.applicationproject.View_Controller.Activity.ManageListActivity;
+import com.example.applicationproject.View_Controller.Activity.StatisticUserActivity;
 import com.example.applicationproject.View_Controller.Adapter.ItemCategoryAdapter;
 import com.example.applicationproject.View_Controller.Adapter.ItemCategoryAdapter.OnClickItemCategoryItem;
 import com.example.applicationproject.View_Controller.Adapter.MissionAdapter;
@@ -69,6 +76,7 @@ import com.example.applicationproject.View_Controller.ClassTemp.NotificationTemp
 import com.example.applicationproject.View_Controller.ClassTemp.TaskString;
 import com.example.applicationproject.View_Controller.DAO;
 import com.example.applicationproject.View_Controller.Service.AlarmScheduler;
+import com.example.applicationproject.View_Controller.Service.CheckActiveService;
 import com.example.applicationproject.View_Controller.ShareDataMission;
 import com.example.applicationproject.R;
 import com.example.applicationproject.View_Controller.Utils.ItemTouchHelperListener;
@@ -106,10 +114,11 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
     private MissionAdapter missionAdapter;
     private LinearLayout emptyView;
     private RecyclerView rVM;
-    private ShareDataMission shareDataDialogs;
+    public static ShareDataMission shareDataDialogs;
     private ToDoDBHelper toDoDBHelper;
     private LocalDate localDate;
     private int user;
+    private int category_id_1;
     private String currentUser;
     private String password;
     private static final long milHour = 3600000L;
@@ -123,8 +132,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
     private static final int EXISTING_TASKBESIDES_LOADER = 4;
     private static final int EXISTING_NOTIFICATIONS_LOADER = 5;
     private RelativeLayout relativeLayout;
-
+    private boolean bound;
     private SearchView searchView;
+    private CheckActiveService myService;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -179,6 +189,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         Log.e("onCreateView:1", currentUser  + " ");
         password = intent.getStringExtra("password");
         user = DAO.getUserId(this.requireContext(), currentUser);
+        category_id_1 = intent.getIntExtra("category_id", -1);
         Log.e("onCreateView:2", String.valueOf(user));
         shareDataDialogs = new ViewModelProvider(requireActivity()).get(ShareDataMission.class);
         getLoaderManager().initLoader(EXISTING_CATEGORIES_LOADER, null, this);
@@ -194,7 +205,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         relativeLayout = view.findViewById(R.id.missionLayout);
 
         missionAdapter = new MissionAdapter(requireContext());
-
+        missionAdapter.getUserId(currentUser);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false);
         rVM.setLayoutManager(linearLayoutManager);
 
@@ -202,17 +213,27 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             localDate = LocalDate.now();
         }
 
-        List<Mission> missions = new ArrayList<>();
-        missions.add(new Mission(1, 1, "29/12/2025", "Complete the project report", "true", "true", "daily", 1, "19:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "28/11/2025", "Complete the project report", "true", "true", "daily", 2, "10:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "27/10/2025", "Complete the project report", "true", "true", "daily", 3, "11:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "26/09/2025", "Complete the project report", "true", "true", "daily", 4, "02:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "25/07/2025", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
-        missions.add(new Mission(1, 1, "28/06/2025", "Complete the project report", "true", "true", "daily", 6, "13:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
-        missionAdapter.setMissionList(missions);
+//        List<Mission> missions = new ArrayList<>();
+//        missions.add(new Mission(1, 1, "29/12/2024", "Complete the project report", "true", "true", "daily", 1, "19:00", "Morning meeting", 1, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "28/11/2024", "Complete the project report", "true", "true", "daily", 2, "10:00", "Morning meeting", 1, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "27/10/2024", "Complete the project report", "true", "true", "daily", 3, "11:00", "Morning meeting", 2, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "26/09/2024", "Complete the project report", "true", "true", "daily", 4, "02:00", "Morning meeting", 2, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "25/07/2024", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "28/06/2024", "Complete the project report", "true", "true", "daily", 6, "13:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "28/06/2024", "Complete the project report", "true", "true", "daily", 7, "14:00", "Morning meeting", 1, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "28/06/2025", "Complete the project report", "true", "true", "daily", 8, "15:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "28/06/2025", "Complete the project report", "true", "true", "daily", 9, "16:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "29/06/2025", "Complete the project report", "true", "true", "daily", 10, "13:00", "Morning meeting", 2, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "29/06/2025", "Complete the project report", "true", "true", "daily", 11, "14:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "29/06/2025", "Complete the project report", "true", "true", "daily", 12, "15:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+//        missions.add(new Mission(1, 1, "27/06/2025", "Complete the project report", "true", "true", "daily", 13, "16:00", "Morning meeting", 3, "5", "10 minutes before", "true", "On"));
+//        shareDataDialogs.setMainList(missions);
 
-        Notification notifycation = new Notification(1, "18:05", 1, "28/12/2024");
-        setalarm(notifycation.getTime(), notifycation.getDate(), notifycation.getMission_id(), "Không", 0, notifycation.getMission_id());
+
+
+
+//        Notification notifycation = new Notification(1, "18:05", 1, "28/12/2024");
+//        setalarm(notifycation.getTime(), notifycation.getDate(), notifycation.getMission_id(), "Không", 0, notifycation.getMission_id());
 
 //        shareDataDialogs.getMainList().observe(getViewLifecycleOwner(), missions -> {
 //            if (missions != null){
@@ -231,6 +252,20 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 //            missionAdapter.setMissionList(missions);
 //            missionAdapter.notifyDataSetChanged();
 //        });
+
+        shareDataDialogs.getMainList().observe(getViewLifecycleOwner(), m -> {
+            Log.e("missionList", "onCreateView: " + m.size());
+            if (!m.isEmpty()){
+                missionAdapter.setMissionList(m);
+                rVM.setVisibility(View.VISIBLE);
+                emptyView.setVisibility(View.GONE);
+            }else{
+                missionAdapter.setMissionList(new ArrayList<>());
+                rVM.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+            }
+        });
+
         rVM.setAdapter(missionAdapter);
 
         ItemTouchHelper.SimpleCallback simpleCallback= new RecyclerViewItemTouchHelper(0, ItemTouchHelper.LEFT, this);
@@ -238,7 +273,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
         setHasOptionsMenu(true);
 
-        checkEmptyData();
+//        checkEmptyData();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -246,10 +281,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 // xét dữ liệu mặc định
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     shareDataDialogs.setDataDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    shareDataDialogs.setDataTime("Không");
                 }
-                shareDataDialogs.setDataTime("Không");
                 shareDataDialogs.setDataNotice("Không");
-                shareDataDialogs.setDataRepeatBool(0);
                 shareDataDialogs.setDataRepeat("Không");
                 shareDataDialogs.setDataRepeatNo(0);
                 shareDataDialogs.setDataRepeatType("Không");
@@ -260,17 +294,16 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 shareDataDialogs.setReminder5("");
                 shareDataDialogs.setReminder6("");
                 shareDataDialogs.setReminder7("");
-                shareDataDialogs.setDataTaskBesideBool(0);
-                shareDataDialogs.setDataSticker(1);
+                shareDataDialogs.setDataSticker(0);
                 shareDataDialogs.setDataRingTone(1);
                 shareDataDialogs.setDataTimeHour(0);
                 shareDataDialogs.setDataTimeMinute(0);
-                List<String> list = new ArrayList<>();
-                List<TaskString> taskStringList = new ArrayList<>();
-                List<NotificationTemp> notificationTemps = new ArrayList<>();
-                shareDataDialogs.setDatataskBesideList(taskStringList);
-                shareDataDialogs.setDatareminders(list);
-                shareDataDialogs.setDataNotificationTemp(notificationTemps);
+//                List<String> list = new ArrayList<>();
+//                List<TaskString> taskStringList = new ArrayList<>();
+//                List<NotificationTemp> notificationTemps = new ArrayList<>();
+                shareDataDialogs.setDatataskBesideList(new ArrayList<>());
+                shareDataDialogs.setDatareminders(new ArrayList<>());
+                shareDataDialogs.setDataNotificationTemp(new ArrayList<>());
                 shareDataDialogs.setDataRemindType("Thông báo");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -280,42 +313,60 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 showBottomDialog();
             }
         });
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        Runnable checkTasksRunnable = new Runnable() {
-            @Override
-            public void run() {
-                checkActive();
-            }
-        };
-        executorService.scheduleAtFixedRate(checkTasksRunnable, 0, 1, TimeUnit.SECONDS);
         return view;
     }
 
-    private void checkActive() {
+    @Override
+    public void onStart() {
+        super.onStart();
+        Intent intent = new Intent(getActivity(), CheckActiveService.class);
+        requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (bound){
+            requireActivity().unbindService(connection);
+            bound = false;
+        }
+    }
+
+    private final ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            CheckActiveService.LocalBinder binder = (CheckActiveService.LocalBinder) service;
+            myService = binder.getService();
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            bound = false;
+        }
+    };
+
+    public static void checkActive(Context context, ShareDataMission shareDataDialogs) {
+        Log.d("CheckTasks", "checkActive called at: " + System.currentTimeMillis());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalDate lcd = LocalDate.now();
             LocalTime lct = LocalTime.now();
 
-            List<Mission> missionList = new ArrayList<>();
-            shareDataDialogs.getMainList().observe(getViewLifecycleOwner(), missions -> {
-                if (missions != null) {
-                    missionList.clear();
-                    missionList.addAll(missions);
-                } else {
-                    missionList.clear();
-                }
-            });
+            List<Mission> missionList = shareDataDialogs.getMainList().getValue();
+            if (missionList == null) {
+                missionList = new ArrayList<>();
+            }
+            Log.e("missionList1", "checkActive: " + missionList.size());
             for (Mission mission : missionList) {
                 LocalDate missionDate = LocalDate.parse(mission.getDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                if (missionDate.equals(lcd)){
-                    LocalTime missionTime = LocalTime.parse(mission.getTime());
-                    if (missionTime.isBefore(lct)){
-                        mission.setIsActive("Off");
-                        DAO.updateActiveMission(requireContext(), mission.getMission_id(), "Off");
-                    }
-                }else if (missionDate.isBefore(lcd)){
+                LocalTime missionTime = LocalTime.parse(mission.getTime(), DateTimeFormatter.ofPattern("H:mm"));
+                LocalDateTime missionDateTime = LocalDateTime.of(missionDate, missionTime);
+                if (missionDateTime.isBefore(LocalDateTime.of(lcd, lct))){
+                    Log.e("missionList2", "checkActive: " + mission.getTitle());
+                    DAO.updateActiveMission(context, mission.getMission_id(), "Off");
                     mission.setIsActive("Off");
-                    DAO.updateActiveMission(requireContext(), mission.getMission_id(), "Off");
+                }else{
+                    Log.e("missionList3", "kocheckdcActive: " + mission.getTitle());
                 }
             }
             shareDataDialogs.setMainList(missionList);
@@ -323,15 +374,15 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     //Kiểm tra dữ liệu có rỗng
-    private void checkEmptyData() {
-        if (missionAdapter.getItemCount() == 0) {
-            rVM.setVisibility(View.GONE);
-            emptyView.setVisibility(View.VISIBLE);
-        } else {
-            rVM.setVisibility(View.VISIBLE);
-            emptyView.setVisibility(View.GONE);
-        }
-    }
+//    private void checkEmptyData() {
+//        if (missionAdapter.getItemCount() == 0) {
+//            rVM.setVisibility(View.GONE);
+//            emptyView.setVisibility(View.VISIBLE);
+//        } else {
+//            rVM.setVisibility(View.VISIBLE);
+//            emptyView.setVisibility(View.GONE);
+//        }
+//    }
 
 //    public List<Mission> getListMission() {
 //
@@ -413,8 +464,15 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             intent.putExtra("password", password);
             startActivity(intent);
             return true;
-        } else if (item.getItemId() == R.id.about) {
-            Toast.makeText(requireContext(), "About", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.thongke) {
+            Intent intent = new Intent(requireContext(), StatisticUserActivity.class);
+            intent.putExtra("name", currentUser);
+            startActivity(intent);
+            return true;
+        }else if (item.getItemId() == R.id.history){
+            Intent intent = new Intent(requireContext(), HistoryActivity.class);
+            intent.putExtra("name", currentUser);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -442,19 +500,23 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         ImageButton pushData = dialog.findViewById(R.id.pushData);
         RecyclerView recyclerView_taskBeside = dialog.findViewById(R.id.recyclerView_taskBeside);
 
-        List<Category> categories = new ArrayList<>();
         shareDataDialogs.getCategoryList().observe(getViewLifecycleOwner(), categorylist -> {
             if (categorylist != null){
-                categories.clear();
-                categories.addAll(categorylist);
-            }else{
-                categories.clear();
-            }
-        });
+                Log.e("category", "showBottomDialog: " + categorylist.size());
+                int data;
+                if (shareDataDialogs.getDataCategory().getValue() == null){
+                    data = categorylist.get(0).getCategory_id();
+                    shareDataDialogs.setDataCategory(data);
+                    Log.e("category_id", "showBottomDialog: " + data);
+                    btnChoseCategory.setText(categorylist.stream().anyMatch(category -> category.getCategory_id() == data) ? categorylist.stream().filter(category -> category.getCategory_id() == data).findFirst().get().getCategory_name() : "Không thể loại");
+                }else{
+                    data = shareDataDialogs.getDataCategory().getValue();
+                    Log.e("category_id", "showBottomDialog: " + data);
+                    btnChoseCategory.setText(categorylist.stream().anyMatch(category -> category.getCategory_id() == data) ? categorylist.stream().filter(category -> category.getCategory_id() == data).findFirst().get().getCategory_name() : "Không thể loại");
+                }
 
-        shareDataDialogs.getDataCategory().observe(getViewLifecycleOwner(), data -> {
-            if (data != null){
-                btnChoseCategory.setText(categories.stream().anyMatch(category -> category.getCategory_id() == data) ? categories.stream().filter(category -> category.getCategory_id() == data).findFirst().get().getCategory_name() : "Không có thể loại");
+            }else{
+                Toast.makeText(getContext(), "Không có danh sách thể loại", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -463,19 +525,17 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             showDialogCategory();
         });
 
-        List<TaskString> taskStringList = new ArrayList<>(); // Sử dụng ArrayList để có thể thêm dữ liệu
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerView_taskBeside.setLayoutManager(layoutManager);
+        TaskBesideAdapter taskBesideAdapter = new TaskBesideAdapter(getContext(), this);
+        recyclerView_taskBeside.setAdapter(taskBesideAdapter);
 
         shareDataDialogs.getDatataskBesideList().observe(getViewLifecycleOwner(), data -> {
-            if (data != null && !data.isEmpty()) {
-                taskStringList.clear(); // Xóa dữ liệu cũ (nếu có)
-                taskStringList.addAll(data); // Cập nhật dữ liệu mới
-                recyclerView_taskBeside.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
-                recyclerView_taskBeside.setAdapter(new TaskBesideAdapter(taskStringList, this));
+            if (data != null) {
+                taskBesideAdapter.setTaskBesideList(data);
                 recyclerView_taskBeside.setVisibility(View.VISIBLE);
             } else {
-                taskStringList.clear(); // Nếu data là null, xóa tất cả phần tử trong danh sách
-                recyclerView_taskBeside.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
-                recyclerView_taskBeside.setAdapter(new TaskBesideAdapter(taskStringList, this));
+                taskBesideAdapter.setTaskBesideList(new ArrayList<>());
                 recyclerView_taskBeside.setVisibility(View.GONE);
             }
         });
@@ -483,9 +543,12 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         //xử lý sự kiện khi click vào nút ImageButton
         btnBeside.setOnClickListener(view -> {
             TaskString taskString = new TaskString("");
-            taskStringList.add(taskString);
-            recyclerView_taskBeside.setVisibility(View.VISIBLE);
-            shareDataDialogs.setDatataskBesideList(taskStringList);
+            List<TaskString> mtaskTaskbesides =  shareDataDialogs.getDatataskBesideList().getValue();
+            if (mtaskTaskbesides == null){
+                mtaskTaskbesides = new ArrayList<>();
+            }
+            mtaskTaskbesides.add(taskString);
+            shareDataDialogs.setDatataskBesideList(mtaskTaskbesides);
         });
 
         //xử lý sự kiện khi click vào nút template
@@ -531,11 +594,11 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                         }
                     });
                     AtomicReference<String> isRepeat = new AtomicReference<>();
-                    shareDataDialogs.getDataRepeatBool().observe(getViewLifecycleOwner(), data -> {
-                        if (data == 1){
-                            isRepeat.set("True");
-                        }else{
+                    shareDataDialogs.getDataRepeat().observe(getViewLifecycleOwner(), data -> {
+                        if (data.equals("Không")){
                             isRepeat.set("False");
+                        }else{
+                            isRepeat.set("True");
                         }
                     });
                     AtomicReference<String> repeatType = new AtomicReference<>();
@@ -547,18 +610,16 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                     shareDataDialogs.getDataCategory().observe(getViewLifecycleOwner(), category_id::set);
                     AtomicReference<String> repeatNo = new AtomicReference<>();
                     shareDataDialogs.getDataRepeatNo().observe(getViewLifecycleOwner(), data -> {
-                        repeatNo.set(String.valueOf(data));
+                        if (data == 0){
+                            repeatNo.set("Không");
+                        }else{
+                            repeatNo.set(data.toString());
+                        }
                     });
-                    String reminder;
-                    if (isNotify.get().equals("True")){
-                        reminder = "True";
-                    }else{
-                        reminder = "False";
-                    }
                     AtomicReference<String> reminderType = new AtomicReference<>();
                     shareDataDialogs.getDataRemindType().observe(getViewLifecycleOwner(), reminderType::set);
                     String isSticker;
-                    if (sticker_id.get() == 1){
+                    if (sticker_id.get() == 0){
                         isSticker = "False";
                     }else{
                         isSticker = "True";
@@ -572,11 +633,20 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                     }else{
                         boolean check = DAO.insertMission(requireContext(), sticker_id.get(), ringTone_id.get(), date.get(), null,
                                 isNotify.get(), isRepeat.get(), repeatType.get(), time.get(), title,
-                                category_id.get(), repeatNo.get(), reminder, reminderType.get(), isSticker, isActive);
+                                category_id.get(), repeatNo.get(), reminderType.get(), isSticker, isActive);
                         if (check){
                             Toast.makeText(getContext(), "Thêm thành công", Toast.LENGTH_SHORT).show();
-                            getLoaderManager().restartLoader(EXISTING_MISIONS_LOADER, null, MissionFragment.this);
                             int id = DAO.findmissionbytitle(requireContext(), title);
+                            getLoaderManager().restartLoader(EXISTING_MISIONS_LOADER, null, MissionFragment.this);
+//                            Mission newMission = new Mission(sticker_id.get(), ringTone_id.get(), date.get(), null,
+//                                    isNotify.get(), isRepeat.get(), repeatType.get(), id ,time.get(), title,
+//                                    category_id.get(), repeatNo.get(), reminderType.get(), isSticker, isActive);
+//                            List<Mission> missionList = shareDataDialogs.getMainList().getValue();
+//                            if (missionList == null){
+//                                missionList = new ArrayList<>();
+//                            }
+//                            missionList.add(newMission);
+//                            shareDataDialogs.setMainList(missionList);
                             List<NotificationTemp> notificationTemps = new ArrayList<>();
                             shareDataDialogs.getDataNotificationTemp().observe(getViewLifecycleOwner(), data -> {
                                 if (!data.isEmpty()){
@@ -603,40 +673,43 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                                         dialog.dismiss();
                                     }else{
                                         Toast.makeText(getContext(), "Thêm thành công", Toast.LENGTH_SHORT).show();
+                                        int id_notification = DAO.findnotificationbyTimeDate(requireContext(), notificationTemp.getTime(), notificationTemp.getDate());
                                         getLoaderManager().restartLoader(EXISTING_NOTIFICATIONS_LOADER, null, MissionFragment.this);
-                                        if (DAO.findnotificationbyTimeDate(requireContext(), notificationTemp.getTime(), notificationTemp.getDate()) != -1){
+//                                        Notification newNotification = new Notification(id_notification, notificationTemp.getTime(), id, notificationTemp.getDate());
+//                                        List<Notification> notificationList = shareDataDialogs.getNotificationList().getValue();
+//                                        if (notificationList == null){
+//                                            notificationList = new ArrayList<>();
+//                                        }
+//                                        notificationList.add(newNotification);
+//                                        shareDataDialogs.setNotificationList(notificationList);
+                                        if (DAO.findnotificationbyTimeDate(requireContext(), notificationTemp.getTime(), notificationTemp.getDate()) == -1){
                                             Toast.makeText(getContext(), "Thêm thất bại", Toast.LENGTH_SHORT).show();
                                             dialog.dismiss();
                                         }else{
                                             Toast.makeText(getContext(), "Thêm thành công", Toast.LENGTH_SHORT).show();
-                                            int id_notification = DAO.findnotificationbyTimeDate(requireContext(), notificationTemp.getTime(), notificationTemp.getDate());
-                                            setalarm(notificationTemp.getTime(), notificationTemp.getDate(), id, retype.get(), reNo.get(), id_notification);
+                                            setalarm(notificationTemp.getTime(), notificationTemp.getDate(), id, retype.get(), reNo.get(), id_notification, currentUser);
                                         }
                                     }
                                 }
-
                             }
 
-                            List<TaskString> taskbesides = new ArrayList<>();
-                            shareDataDialogs.getDatataskBesideList().observe(getViewLifecycleOwner(), data -> {
-                                if (data != null){
-                                    taskbesides.clear();
-                                    taskbesides.addAll(data);
-                                }else {
-                                    taskbesides.clear();
-                                }
-                            });
+                            List<TaskString> taskbesides = shareDataDialogs.getDatataskBesideList().getValue();
+                            if (taskbesides == null){
+                                taskbesides = new ArrayList<>();
+                            }
                             if (taskbesides.isEmpty()){
                                 Toast.makeText(getContext(), "Không có task beside nào!!", Toast.LENGTH_SHORT).show();
                             }else{
                                 for (TaskString taskString : taskbesides) {
-                                    boolean checkTaskBeside = DAO.insertTaskbeside(requireContext(), taskString.getTaskString(), id);
-                                    if (!checkTaskBeside) {
-                                        Toast.makeText(getContext(), "Thêm thất bại", Toast.LENGTH_SHORT).show();
-                                        dialog.dismiss();
-                                    } else {
-                                        Toast.makeText(getContext(), "Thêm thành công", Toast.LENGTH_SHORT).show();
-                                        getLoaderManager().restartLoader(EXISTING_TASKBESIDES_LOADER, null, MissionFragment.this);
+                                    if (!String.valueOf(taskString).isEmpty()){
+                                        boolean checkTaskBeside = DAO.insertTaskbeside(requireContext(), taskString.getTaskString(), id);
+                                        if (!checkTaskBeside) {
+                                            Toast.makeText(getContext(), "Thêm thất bại", Toast.LENGTH_SHORT).show();
+                                            dialog.dismiss();
+                                        } else {
+                                            Toast.makeText(getContext(), "Thêm thành công", Toast.LENGTH_SHORT).show();
+                                            getLoaderManager().restartLoader(EXISTING_TASKBESIDES_LOADER, null, MissionFragment.this);
+                                        }
                                     }
                                 }
                             }
@@ -653,7 +726,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         });
     }
 
-    private void setalarm(String time, String date, int mission_id, String type, int repeatNo, int notify_id){
+    private void setalarm(String time, String date, int mission_id, String type, int repeatNo, int notify_id, String name){
         Calendar mCalender;
         LocalDate mLocalDate;
         LocalTime mLocalTime;
@@ -667,7 +740,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             long selectedTimestamp =  mCalender.getTimeInMillis();
 
             if (type.equals("Không")){
-                new AlarmScheduler().setAlarm(requireContext(), selectedTimestamp, mission_id, notify_id);
+                new AlarmScheduler().setAlarm(requireContext(), selectedTimestamp, mission_id, notify_id, name);
                 Toast.makeText(getContext(), "Đặt lời nhắc thành công" + selectedTimestamp, Toast.LENGTH_SHORT).show();
             }else{
                 if (type.equals("Giờ")){
@@ -679,7 +752,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 }else{
                     mRepeat = repeatNo * milMonth;
                 }
-                new AlarmScheduler().setRepeatAlarm(requireContext(), selectedTimestamp, mission_id, mRepeat, notify_id);
+                new AlarmScheduler().setRepeatAlarm(requireContext(), selectedTimestamp, mission_id, mRepeat, notify_id, name);
                 Toast.makeText(getContext(), "Đặt lời nhắc thành công" + selectedTimestamp, Toast.LENGTH_SHORT).show();
             }
         }
@@ -700,38 +773,32 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
         RecyclerView recyclerView = dialog.findViewById(R.id.listItem_stickers);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
-        List<Sticker> stickerList = new ArrayList<>();
+        StickerAdapter stickerAdapter = new StickerAdapter(this.requireContext(), this);
+        recyclerView.setAdapter(stickerAdapter);
         shareDataDialogs.getStickerList().observe(getViewLifecycleOwner(), stickers -> {
             if (stickers != null){
-                stickerList.clear();
-                stickerList.addAll(stickers);
-                StickerAdapter stickerAdapter = new StickerAdapter(this.requireContext(),stickerList, this);
-                stickerAdapter.notifyDataSetChanged();
-                recyclerView.setAdapter(stickerAdapter);
+                stickerAdapter.setStickerList(stickers);
             }else{
-                stickerList.clear();
-                StickerAdapter stickerAdapter = new StickerAdapter(this.requireContext(),stickerList, this);
-                stickerAdapter.notifyDataSetChanged();
-                recyclerView.setAdapter(stickerAdapter);
+                stickerAdapter.setStickerList(new ArrayList<>());
             }
         });
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-                dialog.dismiss();
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
+//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+//            @Override
+//            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//                dialog.dismiss();
+//                return false;
+//            }
+//
+//            @Override
+//            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//
+//            }
+//
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//
+//            }
+//        });
 
     }
 
@@ -750,20 +817,18 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         // Khởi tạo RecyclerView và Adapter
         RecyclerView recyclerView = dialog.findViewById(R.id.listItem);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
-        List<Category> categoryList = new ArrayList<>();
         itemCategoryAdapter = new ItemCategoryAdapter(getContext(), this, true);
         shareDataDialogs.getCategoryList().observe(getViewLifecycleOwner(), categories -> {
             if (categories != null){
-                categoryList.clear();
-                categoryList.addAll(categories);
+                itemCategoryAdapter.setCategoryList(categories);
             }else{
-                categoryList.clear();
+                itemCategoryAdapter.setCategoryList(new ArrayList<>());
             }
         });
-        itemCategoryAdapter.setCategoryList(categoryList);
         recyclerView.setAdapter(itemCategoryAdapter);
         shareDataDialogs.getDataCategory().observe(getViewLifecycleOwner(), data -> {
             if (data != null){
+                Toast.makeText(getContext(), "data: " + data, Toast.LENGTH_SHORT).show();
                 itemCategoryAdapter.setChosingbyId(data);
             }
         });
@@ -866,6 +931,21 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                                 shareDataDialogs.setDataTime("Không");
                                 Log.e("chosing calendar", "showBottomDialogCalendar: Novalid" + localdate.format(formatter));
                             }
+                            shareDataDialogs.setDataNotice("Không");
+                            shareDataDialogs.setDataRepeat("Không");
+                            shareDataDialogs.setDataRepeatNo(0);
+                            shareDataDialogs.setDataRepeatType("Không");
+                            shareDataDialogs.setReminder("");
+                            shareDataDialogs.setReminder2("");
+                            shareDataDialogs.setReminder3("");
+                            shareDataDialogs.setReminder4("");
+                            shareDataDialogs.setReminder5("");
+                            shareDataDialogs.setReminder6("");
+                            shareDataDialogs.setReminder7("");
+                            shareDataDialogs.setDatataskBesideList(new ArrayList<>());
+                            shareDataDialogs.setDatareminders(new ArrayList<>());
+                            shareDataDialogs.setDataNotificationTemp(new ArrayList<>());
+                            shareDataDialogs.setDataRemindType("Thông báo");
                         }
                     }
                 });
@@ -884,7 +964,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             textViewTime.setText(data);
             if (data.equals("Không")) {
                 layoutNotice.setClickable(false);
-                shareDataDialogs.setDataNotice("Không");
+
             }else{
                 layoutNotice.setClickable(true);
             }
@@ -896,9 +976,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             if (data.equals("Không")){
                 layoutRemind.setVisibility(View.GONE);
                 layoutRepeat.setClickable(false);
-                shareDataDialogs.setDataRepeatType("Không");
             }else{
                 layoutRemind.setVisibility(View.VISIBLE);
+                layoutRepeat.setClickable(true);
             }
         });
 
@@ -916,6 +996,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             @Override
             public void onClick(View view) {
                 Log.e("layoutTime", "layoutTime Click");
+                if (!layoutTime.isClickable()){
+                    return;
+                }
                 showBottomDialogTimePicker();
             }
         });
@@ -924,6 +1007,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             @Override
             public void onClick(View view) {
                 Log.e("layoutNotice", "layoutNotice Click");
+                if (!layoutNotice.isClickable()){
+                    return;
+                }
                 showBottomDialogNotification();
             }
         });
@@ -932,6 +1018,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             @Override
             public void onClick(View view) {
                 Log.e("layoutRepeat", "layoutRepeat Click");
+                if (!layoutRepeat.isClickable()){
+                    return;
+                }
                 showBottomDialogRepeat();
             }
         });
@@ -947,10 +1036,27 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shareDataDialogs.setDataDate("Không");
-                shareDataDialogs.setDataTime("Không");
-                shareDataDialogs.setDataNotice("Không");
-                shareDataDialogs.setDataRepeat("Không");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    shareDataDialogs.setDataDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    shareDataDialogs.setDataTime("Không");
+                    shareDataDialogs.setDataNotice("Không");
+                    shareDataDialogs.setDataRepeat("Không");
+                    shareDataDialogs.setDataRepeatNo(0);
+                    shareDataDialogs.setDataRepeatType("Không");
+                    shareDataDialogs.setReminder("");
+                    shareDataDialogs.setReminder2("");
+                    shareDataDialogs.setReminder3("");
+                    shareDataDialogs.setReminder4("");
+                    shareDataDialogs.setReminder5("");
+                    shareDataDialogs.setReminder6("");
+                    shareDataDialogs.setReminder7("");
+                    shareDataDialogs.setDataTimeHour(0);
+                    shareDataDialogs.setDataTimeMinute(0);
+                    shareDataDialogs.setDatataskBesideList(new ArrayList<>());
+                    shareDataDialogs.setDatareminders(new ArrayList<>());
+                    shareDataDialogs.setDataNotificationTemp(new ArrayList<>());
+                    shareDataDialogs.setDataRemindType("Thông báo");
+                }
                 dialog.dismiss();
             }
         });
@@ -1006,19 +1112,13 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
         RecyclerView recyclerView = dialog.findViewById(R.id.listItem_music);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
-        List<Ringtone> ringtones = new ArrayList<>();
+        RingToneUserAdapter musicAdapter = new RingToneUserAdapter(this.requireContext(), this);
+        recyclerView.setAdapter(musicAdapter);
         shareDataDialogs.getRingtoneList().observe(getViewLifecycleOwner(), ringtonelist -> {
             if (ringtonelist != null){
-                ringtones.clear();
-                ringtones.addAll(ringtonelist);
-                RingToneUserAdapter musicAdapter = new RingToneUserAdapter(this.requireContext(), ringtones, this);
-                recyclerView.setAdapter(musicAdapter);
-                musicAdapter.notifyDataSetChanged();
+                musicAdapter.setRingtoneList(ringtonelist);
             }else{
-                ringtones.clear();
-                RingToneUserAdapter musicAdapter = new RingToneUserAdapter(this.requireContext(), ringtones, this);
-                recyclerView.setAdapter(musicAdapter);
-                musicAdapter.notifyDataSetChanged();
+                musicAdapter.setRingtoneList(new ArrayList<>());
             }
         });
 
@@ -1179,8 +1279,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                                     // Invalid time selection
                                     Toast.makeText(requireContext(), "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show();
                                     shareDataDialogs.setDataTime("Không");
-                                    shareDataDialogs.setDataTimeHour(0);
-                                    shareDataDialogs.setDataTimeMinute(0);
                                     dialog.dismiss();
                                 }
                             }
@@ -1188,6 +1286,67 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                     }
                 }
             });
+            shareDataDialogs.setDataNotice("Không");
+            shareDataDialogs.setDataRepeat("Không");
+            shareDataDialogs.setDataRepeatNo(0);
+            shareDataDialogs.setDataRepeatType("Không");
+            shareDataDialogs.setReminder("");
+            shareDataDialogs.setReminder2("");
+            shareDataDialogs.setReminder3("");
+            shareDataDialogs.setReminder4("");
+            shareDataDialogs.setReminder5("");
+            shareDataDialogs.setReminder6("");
+            shareDataDialogs.setReminder7("");
+            shareDataDialogs.setDatataskBesideList(new ArrayList<>());
+            shareDataDialogs.setDatareminders(new ArrayList<>());
+            shareDataDialogs.setDataNotificationTemp(new ArrayList<>());
+            shareDataDialogs.setDataRemindType("Thông báo");
+        });
+
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), data -> {
+                        if (!data.equals("Không")) {
+                            // Convert the selected date string to LocalDate
+                            LocalDate localDate1 = LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+                            // Get current date and time
+                            LocalDate localDate = LocalDate.now();
+                            LocalTime localTimeNow = LocalTime.now(); // Time right now
+
+                            // Format the time from the TimePicker
+                            LocalTime localTime1;
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
+                            if (timePicker.getMinute() < 10) {
+                                localTime1 = LocalTime.parse(timePicker.getHour() + ":" + "0" + timePicker.getMinute(), formatter);
+                            } else {
+                                localTime1 = LocalTime.parse(timePicker.getHour() + ":" + timePicker.getMinute(), formatter);
+                            }
+
+                            // Combine the date and time into LocalDateTime for comparison
+                            LocalDateTime dateTimeNow = LocalDateTime.of(localDate, localTimeNow);
+                            LocalDateTime selectedDateTime = LocalDateTime.of(localDate1, localTime1);
+
+                            // Compare the selected time with the current time
+                            if (selectedDateTime.isAfter(dateTimeNow)) {
+                                // Valid selection
+                                shareDataDialogs.setDataTime(String.valueOf(localTime1));
+                                shareDataDialogs.setDataTimeHour(timePicker.getHour());
+                                shareDataDialogs.setDataTimeMinute(timePicker.getMinute());
+                                dialog.dismiss();
+                            } else {
+                                // Invalid time selection
+                                Toast.makeText(requireContext(), "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show();
+                                shareDataDialogs.setDataTime("Không");
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                }
+                dialog.dismiss();
+            }
         });
 
 
@@ -1252,95 +1411,110 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             rd2dAgo.setChecked(!data.isEmpty());
         });
 
+        AtomicBoolean rd5mAgoClick = new AtomicBoolean(rd5mAgo.isClickable());
+        AtomicBoolean rd10mAgoClick = new AtomicBoolean(rd10mAgo.isClickable());
+        AtomicBoolean rd30mAgoClick = new AtomicBoolean(rd30mAgo.isClickable());
+        AtomicBoolean rd15mAgoClick = new AtomicBoolean(rd15mAgo.isClickable());
+        AtomicBoolean rd1dAgoClick = new AtomicBoolean(rd1dAgo.isClickable());
+        AtomicBoolean rd2dAgoClick = new AtomicBoolean(rd2dAgo.isClickable());
+        AtomicBoolean rdSameTimeClick = new AtomicBoolean(rdSameTime.isClickable());
+
         shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), days -> {
+            Log.e("days", "show: " + days);
             if (days != null && !days.equals("Không")){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     LocalDate daySetting = LocalDate.parse(days, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    Log.e("daySetting", "show: " + daySetting);
                     if (daySetting.equals(localDate)){
-                        rd1dAgo.setClickable(false);
-                        rd2dAgo.setClickable(false);
+                        Log.e("daySetting", "show: " + daySetting);
+                        rd1dAgoClick.set(false);
+                        Log.e("rd1dAgo", "rd1dAgo.isclickable: " + rd1dAgo.isClickable());
+                        rd2dAgoClick.set(false);
                         AtomicInteger hour = new AtomicInteger();
                         AtomicInteger minute = new AtomicInteger();
                         shareDataDialogs.getDataTimeHour().observe(getViewLifecycleOwner(), hour::set);
                         shareDataDialogs.getDataTimeMinute().observe(getViewLifecycleOwner(), minute::set);
                         LocalTime localTime = LocalTime.now();
+                        Log.e("time", "showBottomDialogNotification: " + localTime.getHour());
                         if (hour.get() == localTime.getHour()){
                             if (minute.get() - localTime.getMinute() < 5){
-                                rd5mAgo.setClickable(false);
-                                rd10mAgo.setClickable(false);
-                                rd15mAgo.setClickable(false);
-                                rd30mAgo.setClickable(false);
+                                rdSameTimeClick.set(true);
+                                rd5mAgoClick.set(false);
+                                rd10mAgoClick.set(false);
+                                rd15mAgoClick.set(false);
+                                rd30mAgoClick.set(false);
                             }else if (minute.get() - localTime.getMinute() < 10 && minute.get() - localTime.getMinute() >= 5){
-                                rd5mAgo.setClickable(true);
-                                rd10mAgo.setClickable(false);
-                                rd15mAgo.setClickable(false);
-                                rd30mAgo.setClickable(false);
+                                rdSameTimeClick.set(true);
+                                rd5mAgoClick.set(true);
+                                rd10mAgoClick.set(false);
+                                rd15mAgoClick.set(false);
+                                rd30mAgoClick.set(false);
                             }else if (minute.get() - localTime.getMinute() < 15 && minute.get() - localTime.getMinute() >= 10){
-                                rd5mAgo.setClickable(true);
-                                rd10mAgo.setClickable(true);
-                                rd15mAgo.setClickable(false);
-                                rd30mAgo.setClickable(false);
+                                rdSameTimeClick.set(true);
+                                rd5mAgoClick.set(true);
+                                rd10mAgoClick.set(true);
+                                rd15mAgoClick.set(false);
+                                rd30mAgoClick.set(false);
                             }else if (minute.get() - localTime.getMinute() < 30 && minute.get() - localTime.getMinute() >= 15){
-                                rd5mAgo.setClickable(true);
-                                rd10mAgo.setClickable(true);
-                                rd15mAgo.setClickable(true);
-                                rd30mAgo.setClickable(false);
+                                rdSameTimeClick.set(true);
+                                rd5mAgoClick.set(true);
+                                rd10mAgoClick.set(true);
+                                rd15mAgoClick.set(true);
+                                rd30mAgoClick.set(false);
                             }else if (minute.get() - localTime.getMinute() >= 30){
-                                rd5mAgo.setClickable(true);
-                                rd10mAgo.setClickable(true);
-                                rd15mAgo.setClickable(true);
-                                rd30mAgo.setClickable(true);
+                                rdSameTimeClick.set(true);
+                                rd5mAgoClick.set(true);
+                                rd10mAgoClick.set(true);
+                                rd15mAgoClick.set(true);
+                                rd30mAgoClick.set(true);
+                            }else{
+                                rdSameTimeClick.set(false);
+                                rd5mAgoClick.set(false);
+                                rd10mAgoClick.set(false);
+                                rd15mAgoClick.set(false);
+                                rd30mAgoClick.set(false);
                             }
                         }
                     }else{
-                        if (daySetting.getMonth().equals(localDate.getMonth())){
-                            if (Math.abs(daySetting.getDayOfMonth() - localDate.getDayOfMonth()) == 1){
-                                rd2dAgo.setClickable(false);
-                                rd1dAgo.setClickable(true);
-                                rd5mAgo.setClickable(true);
-                                rd10mAgo.setClickable(true);
-                                rd15mAgo.setClickable(true);
-                                rd30mAgo.setClickable(true);
-                            }else if (Math.abs(daySetting.getDayOfMonth() - localDate.getDayOfMonth()) >= 2){
-                                rd1dAgo.setClickable(true);
-                                rd2dAgo.setClickable(true);
-                                rd5mAgo.setClickable(true);
-                                rd10mAgo.setClickable(true);
-                                rd15mAgo.setClickable(true);
-                                rd30mAgo.setClickable(true);
-                            }
+                        if (daySetting.minusDays(1).equals(localDate)){
+                            rd2dAgoClick.set(false);
+                            rd1dAgoClick.set(true);
+                        }else if (daySetting.minusDays(2).equals(localDate) || daySetting.minusDays(2).isAfter(localDate)){
+                            rd2dAgoClick.set(true);
+                            rd1dAgoClick.set(true);
+                        }else{
+                            rd2dAgoClick.set(false);
+                            rd1dAgoClick.set(false);
                         }
                     }
                 }
             }
         });
 
-        List<String> list = new ArrayList<>();
-        shareDataDialogs.getDatareminders().observe(getViewLifecycleOwner(), reminders -> {
-            Log.e("reminders", "reminders size: " + (reminders != null ? reminders.size() : "null"));
-            if (reminders != null && !reminders.isEmpty()) {
-                Log.e("reminders", "reminders: " + reminders.getClass().getName());
-                list.clear();
-                Log.e("reminders", "Before adding, list size: " + list.size());
-                for (String reminder : reminders){
-                    Log.e("reminder", "reminder: " + reminder);
-                    list.add(reminder);
-                }
-                Log.e("reminders", "After adding, list size: " + list.size());
-            } else {
-                Log.e("reminders", "No data to add");
-            }
-        });
-
-        List<NotificationTemp> list1 = new ArrayList<>();
-        shareDataDialogs.getDataNotificationTemp().observe(getViewLifecycleOwner(), notificationList1 -> {
-            Log.e("notificationList1", "notificationList1: " + notificationList1.size());
-            if (notificationList1 != null){
-                list1.clear();
-                list1.addAll(notificationList1);
-            }
-            Log.e("notificationList1", "showBottomDialogNotification: " + list1.size());
-        });
+//        shareDataDialogs.getDatareminders().observe(getViewLifecycleOwner(), reminders -> {
+//            Log.e("reminders", "reminders size: " + (reminders != null ? reminders.size() : "null"));
+//            if (reminders != null && !reminders.isEmpty()) {
+//                Log.e("reminders", "reminders: " + reminders.getClass().getName());
+//                list.clear();
+//                Log.e("reminders", "Before adding, list size: " + list.size());
+//                for (String reminder : reminders){
+//                    Log.e("reminder", "reminder: " + reminder);
+//                    list.add(reminder);
+//                }
+//                Log.e("reminders", "After adding, list size: " + list.size());
+//            } else {
+//                Log.e("reminders", "No data to add");
+//            }
+//        });
+//
+//        shareDataDialogs.getDataNotificationTemp().observe(getViewLifecycleOwner(), notificationList1 -> {
+//            Log.e("notificationList1", "notificationList1: " + notificationList1.size());
+//            if (notificationList1 != null){
+//                list1.clear();
+//                list1.addAll(notificationList1);
+//            }
+//            Log.e("notificationList1", "showBottomDialogNotification: " + list1.size());
+//        });
 
         AtomicReference<String> day = new AtomicReference<>();
         shareDataDialogs.getDataDate().observe(getViewLifecycleOwner(), days -> {
@@ -1364,49 +1538,75 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         AtomicInteger minute = new AtomicInteger();
 
         shareDataDialogs.getDataTimeHour().observe(getViewLifecycleOwner(), hour::set);
+        Log.e("hour", "showBottomDialogNotification: " + hour.get());
 
         shareDataDialogs.getDataTimeMinute().observe(getViewLifecycleOwner(), minute::set);
 
+        AtomicBoolean rdSameTimeCheck = new AtomicBoolean(rdSameTime.isChecked());
         rdSameTime.setOnClickListener(view -> {
-            if (rdSameTime.isChecked()){
+            if (!rdSameTimeClick.get()){
+                return;
+            }
+            if (rdSameTimeCheck.get()){
                 rdSameTime.setChecked(false);
-                shareDataDialogs.getDataTime().observe(getViewLifecycleOwner(), data -> {
-                    list.remove(day.get() + " " + data);
-                    NotificationTemp notificationTemp = new NotificationTemp(day.get(), data);
+                rdSameTimeCheck.set(false);
+                String data = shareDataDialogs.getReminder().getValue();
+                if (data != null && !data.isEmpty()){
+                    String time1 = data.split(" ")[1];
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
+                    list.remove(day.get() + " " + time1);
+                    NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
                     list1.remove(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
                     shareDataDialogs.setReminder("");
-                });
+                }else{
+                    shareDataDialogs.setReminder("");
+                }
             }else{
                 rdSameTime.setChecked(true);
-                shareDataDialogs.getDataTime().observe(getViewLifecycleOwner(), data -> {
-                    list.add(day.get() + " " + data);
-                    NotificationTemp notificationTemp = new NotificationTemp(day.get(), data);
-                    list1.add(notificationTemp);
-                    shareDataDialogs.setReminder(day.get() + " " + data);
-                });
+                rdSameTimeCheck.set(true);
+                String data = shareDataDialogs.getDataTime().getValue();
+                List<String> list = shareDataDialogs.getDatareminders().getValue();
+                if (list == null) list = new ArrayList<>();
+                list.add(day.get() + " " + data);
+                shareDataDialogs.setDatareminders(list);
+                NotificationTemp notificationTemp = new NotificationTemp(day.get(), data);
+                List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                if (list1 == null) list1 = new ArrayList<>();
+                list1.add(notificationTemp);
+                shareDataDialogs.setDataNotificationTemp(list1);
+                shareDataDialogs.setReminder(day.get() + " " + data);
             }
         });
 
         AtomicBoolean rd5mAgoCheck = new AtomicBoolean(rd5mAgo.isChecked());
         Log.e("rd5mAgoCheck", "rd5mAgoCheck: " + rd5mAgoCheck);
         rd5mAgo.setOnClickListener(view -> {
+            if (!rd5mAgoClick.get()){
+                return;
+            }
             if (rd5mAgoCheck.get()) {
                 rd5mAgo.setChecked(false);
                 rd5mAgoCheck.set(false);
-                shareDataDialogs.getReminder2().observe(getViewLifecycleOwner(), data -> {
-                    Log.e("Reminder2 Data", "Data received: " + data);
-                    if (!data.isEmpty()){
-                        String time1 = data.split(" ")[1];
-                        list.remove(data);
-                        shareDataDialogs.setDatareminders(list);
-                        NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
-                        list1.remove(notificationTemp);
-                        shareDataDialogs.setDataNotificationTemp(list1);
-                        shareDataDialogs.setReminder2("");
-                    }else{
-                        shareDataDialogs.setReminder2("");
-                    }
-                });
+                String data = shareDataDialogs.getReminder2().getValue();
+                if (data != null && !data.isEmpty()){
+                    String time1 = data.split(" ")[1];
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
+                    list.remove(data);
+                    shareDataDialogs.setDatareminders(list);
+                    NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
+                    list1.remove(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
+                    shareDataDialogs.setReminder2("");
+                }else{
+                    shareDataDialogs.setReminder2("");
+                }
             } else {
                 rd5mAgo.setChecked(true);
                 rd5mAgoCheck.set(true);
@@ -1422,10 +1622,14 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 }else{
                     s = hour.get() + ":" + minute.get();
                 }
+                List<String> list = shareDataDialogs.getDatareminders().getValue();
+                if (list == null) list = new ArrayList<>();
                 list.add(day.get() + " " + s);
                 Log.e("list", "Datareminders: " + list.size());
                 shareDataDialogs.setDatareminders(list);
                 NotificationTemp notificationTemp = new NotificationTemp(day.get(), s);
+                List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                if (list1 == null) list1 = new ArrayList<>();
                 list1.add(notificationTemp);
                 Log.e("list1", "DataNotificationTemp: " + list1.size());
                 shareDataDialogs.setDataNotificationTemp(list1);
@@ -1435,8 +1639,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             }
         });
 
-        Log.e("DataNotificationTemp1", "DataNotificationTemp: " + list1.size());
-        Log.e("setDatareminders0", "setDatareminders: " + list.size());
 
 
 //        rd5mAgo.setOnClickListener(view ->{
@@ -1475,19 +1677,33 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 //                shareDataDialogs.setReminder2(day.get() + " " + s);
 //            }
 //        });
-
+        AtomicBoolean rd10mAgoCheck = new AtomicBoolean(rd10mAgo.isChecked());
         rd10mAgo.setOnClickListener(view -> {
-            if (rd10mAgo.isChecked()){
+            if (!rd10mAgoClick.get()){
+                return;
+            }
+            if (rd10mAgoCheck.get()) {
                 rd10mAgo.setChecked(false);
-                shareDataDialogs.getReminder3().observe(getViewLifecycleOwner(), data -> {
-                    list.remove(data);
+                rd10mAgoCheck.set(false);
+                String data = shareDataDialogs.getReminder3().getValue();
+                if (data != null && !data.isEmpty()){
                     String time1 = data.split(" ")[1];
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
+                    list.remove(data);
+                    shareDataDialogs.setDatareminders(list);
                     NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
                     list1.remove(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
                     shareDataDialogs.setReminder3("");
-                });
+                }else{
+                    shareDataDialogs.setReminder3("");
+                }
             }else{
                 rd10mAgo.setChecked(true);
+                rd10mAgoCheck.set(true);
                 if (minute.get() >= 10){
                     minute.set(minute.get() - 10);
                 }else{
@@ -1500,26 +1716,46 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 }else{
                     s = hour.get() + ":" + minute.get();
                 }
+                List<String> list = shareDataDialogs.getDatareminders().getValue();
+                if (list == null) list = new ArrayList<>();
                 list.add(day.get() + " " + s);
+                shareDataDialogs.setDatareminders(list);
                 NotificationTemp notificationTemp = new NotificationTemp(day.get(), s);
+                List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                if (list1 == null) list1 = new ArrayList<>();
                 list1.add(notificationTemp);
+                shareDataDialogs.setDataNotificationTemp(list1);
                 shareDataDialogs.setReminder3(day.get() + " " + s);
             }
         });
 
+        AtomicBoolean rd15mAgoCheck = new AtomicBoolean(rd15mAgo.isChecked());
         rd15mAgo.setOnClickListener(view -> {
-            if (rd15mAgo.isChecked()){
+            if (!rd15mAgoClick.get()){
+                return;
+            }
+            if (rd15mAgoCheck.get()){
                 rd15mAgo.setChecked(false);
-                shareDataDialogs.getReminder4().observe(getViewLifecycleOwner(), data -> {
-                    Log.e("rd15mAgo", "rd15mAgo: " + data);
+                rd15mAgoCheck.set(false);
+                String data = shareDataDialogs.getReminder4().getValue();
+                if (data != null && !data.isEmpty()){
                     String time1 = data.split(" ")[1];
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
                     list.remove(data);
+                    shareDataDialogs.setDatareminders(list);
                     NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
                     list1.remove(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
                     shareDataDialogs.setReminder4("");
-                });
+                }else{
+                    shareDataDialogs.setReminder4("");
+                }
             }else{
                 rd15mAgo.setChecked(true);
+                rd15mAgoCheck.set(true);
                 if (minute.get() >= 15){
                     minute.set(minute.get() - 15);
                 }else{
@@ -1532,25 +1768,46 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 }else{
                     s = hour.get() + ":" + minute.get();
                 }
+                List<String> list = shareDataDialogs.getDatareminders().getValue();
+                if (list == null) list = new ArrayList<>();
                 list.add(day.get() + " " + s);
+                shareDataDialogs.setDatareminders(list);
                 NotificationTemp notificationTemp = new NotificationTemp(day.get(), s);
+                List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                if (list1 == null) list1 = new ArrayList<>();
                 list1.add(notificationTemp);
+                shareDataDialogs.setDataNotificationTemp(list1);
                 shareDataDialogs.setReminder4(day.get() + " " + s);
             }
         });
 
+        AtomicBoolean rd30mAgoCheck = new AtomicBoolean(rd30mAgo.isChecked());
         rd30mAgo.setOnClickListener(view -> {
-            if (rd30mAgo.isChecked()){
+            if (!rd30mAgoClick.get()){
+                return;
+            }
+            if (rd30mAgoCheck.get()){
                 rd30mAgo.setChecked(false);
-                shareDataDialogs.getReminder5().observe(getViewLifecycleOwner(), data -> {
+                rd30mAgoCheck.set(false);
+                String data = shareDataDialogs.getReminder5().getValue();
+                if (data != null && !data.isEmpty()){
                     String time1 = data.split(" ")[1];
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
                     list.remove(data);
+                    shareDataDialogs.setDatareminders(list);
                     NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
                     list1.remove(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
                     shareDataDialogs.setReminder5("");
-                });
+                }else{
+                    shareDataDialogs.setReminder5("");
+                }
             }else{
                 rd30mAgo.setChecked(true);
+                rd30mAgoCheck.set(true);
                 if (minute.get() >= 30){
                     minute.set(minute.get() - 30);
                 }else {
@@ -1563,54 +1820,106 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 }else{
                     s = hour.get() + ":" + minute.get();
                 }
+                List<String> list = shareDataDialogs.getDatareminders().getValue();
+                if (list == null) list = new ArrayList<>();
                 list.add(day.get() + " " + s);
+                shareDataDialogs.setDatareminders(list);
                 NotificationTemp notificationTemp = new NotificationTemp(day.get(), s);
+                List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                if (list1 == null) list1 = new ArrayList<>();
                 list1.add(notificationTemp);
+                shareDataDialogs.setDataNotificationTemp(list1);
                 shareDataDialogs.setReminder5(day.get() + " " + s);
             }
         });
 
+        AtomicBoolean rd1dAgoCheck = new AtomicBoolean(rd1dAgo.isChecked());
         rd1dAgo.setOnClickListener(view -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalDate dateDay = LocalDate.parse(day.get(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                dateDay.minusDays(1);
-                String s = dateDay.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                if (rd1dAgo.isChecked()){
-                    rd1dAgo.setChecked(false);
-                    shareDataDialogs.getReminder6().observe(getViewLifecycleOwner(), data -> {
-                        list.remove(data);
-                        NotificationTemp notificationTemp = new NotificationTemp(s, time.get());
-                        list1.remove(notificationTemp);
-                        shareDataDialogs.setReminder6("");
-                    });
+            Log.e("rd1dAgo", "rd1dAgo: " + rd1dAgo.isClickable());
+            if (!rd1dAgoCheck.get()){
+                return;
+            }
+            if (rd1dAgoCheck.get()){
+                rd1dAgo.setChecked(false);
+                rd1dAgoCheck.set(false);
+                String data = shareDataDialogs.getReminder6().getValue();
+                if (data != null && !data.isEmpty()){
+                    String time1 = data.split(" ")[1];
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
+                    list.remove(data);
+                    shareDataDialogs.setDatareminders(list);
+                    NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
+                    list1.remove(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
+                    shareDataDialogs.setReminder6("");
                 }else{
-                    rd1dAgo.setChecked(true);
-                    list.add(s + " " + time.get());
-                    NotificationTemp notificationTemp = new NotificationTemp(s, time.get());
-                    list1.add(notificationTemp);
-                    shareDataDialogs.setReminder6(s + " " + time.get());
+                    shareDataDialogs.setReminder6("");
+                }
+            }else{
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    LocalDate dateDay = LocalDate.parse(day.get(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    dateDay = dateDay.minusDays(1);
+                    String s = dateDay.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        rd1dAgo.setChecked(true);
+                        rd1dAgoCheck.set(true);
+                        List<String> list = shareDataDialogs.getDatareminders().getValue();
+                        if (list == null) list = new ArrayList<>();
+                        list.add(s + " " + time.get());
+                        shareDataDialogs.setDatareminders(list);
+                        NotificationTemp notificationTemp = new NotificationTemp(s, time.get());
+                        List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                        if (list1 == null) list1 = new ArrayList<>();
+                        list1.add(notificationTemp);
+                        shareDataDialogs.setDataNotificationTemp(list1);
+                        shareDataDialogs.setReminder6(s + " " + time.get());
                 }
             }
         });
 
+        AtomicBoolean rd2dAgoCheck = new AtomicBoolean(rd2dAgo.isChecked());
         rd2dAgo.setOnClickListener(view -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalDate dateDay = LocalDate.parse(day.get(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                dateDay.minusDays(2);
-                String s = dateDay.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                if (rd2dAgo.isChecked()){
-                    rd2dAgo.setChecked(false);
-                    shareDataDialogs.getReminder7().observe(getViewLifecycleOwner(), data -> {
-                        list.remove(data);
-                        NotificationTemp notificationTemp = new NotificationTemp(s, time.get());
-                        list1.remove(notificationTemp);
-                        shareDataDialogs.setReminder7("");
-                    });
-                }else{
+            Log.e("rd2dAgo", "rd2dAgo: " + rd2dAgo.isClickable());
+            if (!rd2dAgoCheck.get()){
+                return;
+            }
+            if (rd2dAgoCheck.get()) {
+                rd2dAgo.setChecked(false);
+                rd2dAgoCheck.set(false);
+                String data = shareDataDialogs.getReminder7().getValue();
+                if (data != null && !data.isEmpty()) {
+                    String time1 = data.split(" ")[1];
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
+                    list.remove(data);
+                    shareDataDialogs.setDatareminders(list);
+                    NotificationTemp notificationTemp = new NotificationTemp(day.get(), time1);
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
+                    list1.remove(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
+                    shareDataDialogs.setReminder7("");
+                } else {
+                    shareDataDialogs.setReminder7("");
+                }
+            }else{
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    LocalDate dateDay = LocalDate.parse(day.get(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    dateDay = dateDay.minusDays(2);
+                    String s = dateDay.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     rd2dAgo.setChecked(true);
+                    rd2dAgoCheck.set(true);
+                    List<String> list = shareDataDialogs.getDatareminders().getValue();
+                    if (list == null) list = new ArrayList<>();
                     list.add(s + " " + time.get());
+                    shareDataDialogs.setDatareminders(list);
                     NotificationTemp notificationTemp = new NotificationTemp(s, time.get());
+                    List<NotificationTemp> list1 = shareDataDialogs.getDataNotificationTemp().getValue();
+                    if (list1 == null) list1 = new ArrayList<>();
                     list1.add(notificationTemp);
+                    shareDataDialogs.setDataNotificationTemp(list1);
                     shareDataDialogs.setReminder7(s + " " + time.get());
                 }
             }
@@ -1624,11 +1933,12 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 shareDataDialogs.getDatareminders().observe(getViewLifecycleOwner(), data -> {
                     Log.e("list", "Datareminders: " + data);
                     if (data.isEmpty()){
+                        shareDataDialogs.setDataNotice("Không");
                         dialog.dismiss();
                     }else{
                         final String[] s = {""};
                         data.forEach(d -> {
-                            s[0] = s[0] + d;
+                            s[0] = s[0] + d + ",";
                         });
                         shareDataDialogs.setDataNotice(s[0]);
                         dialog.dismiss();
@@ -1641,9 +1951,10 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         no.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shareDataDialogs.setDatareminders(new ArrayList<>());
-                shareDataDialogs.setDataNotificationTemp(new ArrayList<>());
                 shareDataDialogs.setDataNotice("Không");
+                shareDataDialogs.setDataRepeat("Không");
+                shareDataDialogs.setDataRepeatNo(0);
+                shareDataDialogs.setDataRepeatType("Không");
                 shareDataDialogs.setReminder("");
                 shareDataDialogs.setReminder2("");
                 shareDataDialogs.setReminder3("");
@@ -1651,6 +1962,12 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 shareDataDialogs.setReminder5("");
                 shareDataDialogs.setReminder6("");
                 shareDataDialogs.setReminder7("");
+                shareDataDialogs.setDataTimeHour(0);
+                shareDataDialogs.setDataTimeMinute(0);
+                shareDataDialogs.setDatataskBesideList(new ArrayList<>());
+                shareDataDialogs.setDatareminders(new ArrayList<>());
+                shareDataDialogs.setDataNotificationTemp(new ArrayList<>());
+                shareDataDialogs.setDataRemindType("Thông báo");
                 dialog.dismiss();
             }
         });
@@ -1659,6 +1976,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
     @SuppressLint("SetTextI18n")
     private void showBottomDialogRepeat() {
+        Log.e("click", "showBottomDialogRepeat: onclick");
         final Dialog dialog = new Dialog(requireContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.fragment_mission_add_calendar_repeat);
@@ -1670,73 +1988,63 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         dialog.getWindow().setGravity(Gravity.CENTER);
 
         RelativeLayout repeat = dialog.findViewById(R.id.repeat);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch repeatSwitch = dialog.findViewById(R.id.repeat_switch);
+        SwitchCompat repeatSwitch = dialog.findViewById(R.id.repeat_switch);
         RelativeLayout repeatNo = dialog.findViewById(R.id.RepeatNo);
         RelativeLayout repeatType = dialog.findViewById(R.id.RepeatType);
         TextView setRepeatNo = dialog.findViewById(R.id.set_repeat_no);
         TextView setRepeatType = dialog.findViewById(R.id.set_repeat_type);
 
-        AtomicInteger time = new AtomicInteger();
         shareDataDialogs.getDataRepeatNo().observe(getViewLifecycleOwner(), data -> {
-            if (data != null){
-                time.set(data);
+            if (data != null && data != 0){
+                setRepeatNo.setText(String.valueOf(data));
             }else {
-                time.set(0);
+                setRepeatNo.setText("Không");
             }
         });
 
-        AtomicReference<String> type = new AtomicReference<>();
         shareDataDialogs.getDataRepeatType().observe(getViewLifecycleOwner(), data -> {
-            if (data != null){
-                type.set(data);
+            if (data != null && !data.isEmpty()){
                 setRepeatType.setText(data);
             }else{
-                type.set("Không");
                 setRepeatType.setText("Không");
             }
         });
 
-        shareDataDialogs.getDataRepeat().observe(getViewLifecycleOwner(), data -> {
-            if (data.equals("Không")){
-                shareDataDialogs.setDataRepeatBool(0);
-            }else{
-                shareDataDialogs.setDataRepeatBool(1);
-            }
-        });
+//
+//        shareDataDialogs.getDataRepeatBool().observe(getViewLifecycleOwner(), data -> {
+//            if (data == 0){
+//                repeatSwitch.setChecked(false);
+//                repeatNo.setClickable(false);
+//                repeatType.setClickable(false);
+//                shareDataDialogs.setDataRepeatNo(0);
+//                shareDataDialogs.setDataRepeatType("Không");
+//                shareDataDialogs.setDataRepeat("Không");
+//            }else{
+//                repeatSwitch.setChecked(true);
+//                repeatNo.setClickable(true);
+//                repeatType.setClickable(true);
+//                shareDataDialogs.setDataRepeat("Mỗi" + " " + time.get() + " " + type.get() + "(s)");
+//            }
+//        });
 
-        shareDataDialogs.getDataRepeatBool().observe(getViewLifecycleOwner(), data -> {
-            if (data == 0){
-                repeatSwitch.setChecked(false);
-                repeatNo.setClickable(false);
-                repeatType.setClickable(false);
-                shareDataDialogs.setDataRepeatNo(0);
-                shareDataDialogs.setDataRepeatType("Không");
-                shareDataDialogs.setDataRepeat("Không");
-            }else{
-                repeatSwitch.setChecked(true);
-                repeatNo.setClickable(true);
-                repeatType.setClickable(true);
-                shareDataDialogs.setDataRepeat("Mỗi" + " " + time.get() + " " + type.get() + "(s)");
-            }
-        });
-
-        shareDataDialogs.getDataRepeatNo().observe(getViewLifecycleOwner(), data -> {
-            if (data == 0){
-                setRepeatNo.setText("Không");
-            }else{
-                setRepeatNo.setText(data);
-            }
-        });
-
+//
         repeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (repeatSwitch.isChecked()){
-                    shareDataDialogs.setDataRepeatBool(0);
                     repeatSwitch.setChecked(false);
+                    repeatType.setClickable(false);
+                    repeatNo.setClickable(false);
+                    shareDataDialogs.setDataRepeat("Không");
+                    shareDataDialogs.setDataRepeatNo(0);
+                    shareDataDialogs.setDataRepeatType("Không");
                 }else{
-                    shareDataDialogs.setDataRepeatBool(1);
                     repeatSwitch.setChecked(true);
+                    repeatType.setClickable(true);
+                    repeatNo.setClickable(true);
+                    shareDataDialogs.setDataRepeatNo(1);
+                    shareDataDialogs.setDataRepeatType("Giờ");
+                    shareDataDialogs.setDataRepeat("Mỗi" + " " + 1 + " " + "Giờ" + "(s)");
                 }
             }
         });
@@ -1744,12 +2052,20 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
         repeatSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (repeatSwitch.isChecked()) {
+                if (repeatSwitch.isChecked()){
                     repeatSwitch.setChecked(false);
-                    shareDataDialogs.setDataRepeatBool(0);
-                } else {
+                    shareDataDialogs.setDataRepeat("Không");
+                    shareDataDialogs.setDataRepeatNo(0);
+                    shareDataDialogs.setDataRepeatType("Không");
+                    repeatType.setClickable(false);
+                    repeatNo.setClickable(false);
+                }else{
                     repeatSwitch.setChecked(true);
-                    shareDataDialogs.setDataRepeatBool(1);
+                    repeatType.setClickable(true);
+                    repeatNo.setClickable(true);
+                    shareDataDialogs.setDataRepeatNo(1);
+                    shareDataDialogs.setDataRepeatType("Giờ");
+                    shareDataDialogs.setDataRepeat("Mỗi" + " " + 1 + " " + "Giờ" + "(s)");
                 }
             }
         });
@@ -1767,15 +2083,26 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             builder.setItems(items, new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int item) {
+                    if (item != 0 && item != 1 && item != 2 && item != 3){
+                        shareDataDialogs.setDataRepeatType("Giờ");
+                        int time;
+                        if (shareDataDialogs.getDataRepeatNo().getValue() == null || shareDataDialogs.getDataRepeatNo().getValue() == 0){
+                            time = 1;
+                        }else{
+                            time = shareDataDialogs.getDataRepeatNo().getValue();
+                        }
+                        shareDataDialogs.setDataRepeat("Mỗi" + " " + time + " " + "Giờ" + "(s)");
+                        dialog.dismiss();
+                    }
                     shareDataDialogs.setDataRepeatType(items[item]);
                     int time;
-                    if (shareDataDialogs.getDataRepeatNo().getValue() == null){
-                        time = 0;
+                    if (shareDataDialogs.getDataRepeatNo().getValue() == null || shareDataDialogs.getDataRepeatNo().getValue() == 0){
+                        time = 1;
                     }else{
                         time = shareDataDialogs.getDataRepeatNo().getValue();
                     }
-                    String type = shareDataDialogs.getDataRepeatType().getValue();
-                    shareDataDialogs.setDataRepeat("Mỗi" + " " + time + " " + type + "(s)");
+                    shareDataDialogs.setDataRepeat("Mỗi" + " " + time + " " + items[item] + "(s)");
+                    dialog.dismiss();
                 }
             });
             AlertDialog alert = builder.create();
@@ -1795,33 +2122,29 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 alert.setPositiveButton("Ok",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-
-                                if (input.getText().toString().isEmpty()) {
+                                if (input.getText().toString().isEmpty() || input.getText().toString().equals("0")) {
                                     shareDataDialogs.setDataRepeatNo(1);
-                                    int time;
-                                    if (shareDataDialogs.getDataRepeatNo().getValue() == null){
-                                        time = 0;
-                                    }else{
-                                        time = shareDataDialogs.getDataRepeatNo().getValue();
-                                    }
-                                    String type = shareDataDialogs.getDataRepeatType().getValue();
-                                    shareDataDialogs.setDataRepeat("Mỗi" + " " + time + " " + type + "(s)");
-                                }
-                                else {
+                                }else{
                                     shareDataDialogs.setDataRepeatNo(Integer.parseInt(input.getText().toString()));
-                                    int time;
-                                    if (shareDataDialogs.getDataRepeatNo().getValue() == null){
-                                        time = 0;
-                                    }else{
-                                        time = shareDataDialogs.getDataRepeatNo().getValue();
-                                    }
-                                    String type = shareDataDialogs.getDataRepeatType().getValue();
-                                    shareDataDialogs.setDataRepeat("Mỗi" + " " + time + " " + type + "(s)");
                                 }
+                                String type = shareDataDialogs.getDataRepeatType().getValue();
+                                if (type == null || type.isEmpty()){
+                                    type = "Giờ";
+                                }
+                                int time;
+                                if (shareDataDialogs.getDataRepeatNo().getValue() == null || shareDataDialogs.getDataRepeatNo().getValue() == 0){
+                                    time = 1;
+                                }else{
+                                    time = shareDataDialogs.getDataRepeatNo().getValue();
+                                }
+                                shareDataDialogs.setDataRepeat("Mỗi" + " " + time + " " + type + "(s)");
+
+                                dialog.dismiss();
                             }
                         });
                 alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
+                        shareDataDialogs.setDataRepeatNo(1);
                         dialog.dismiss();
                     }
                 });
@@ -1844,7 +2167,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                         ToDoDBContract.MissionEntry.MISSION_isREPEAT,
                         ToDoDBContract.MissionEntry.MISSION_REPEAT_TYPE,
                         ToDoDBContract.MissionEntry.MISSION_REPEAT_NO,
-                        ToDoDBContract.MissionEntry.MISSION_REMINDER,
                         ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE,
                         ToDoDBContract.MissionEntry.MISSION_RINGTONE_ID,
                         ToDoDBContract.MissionEntry.MISSION_DESCRIPTION,
@@ -1897,18 +2219,17 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        List<Ringtone> ringtoneList = null;
-        List<Sticker> stickerList = null;
-        List<Taskbeside> taskbesideList = null;
-        List<Notification> notificationList = null;
-        List<Category> mcategoryList = null;
-        List<Mission> missionList = null;
+        List<Ringtone> ringtoneList = new ArrayList<>();
+        List<Sticker> stickerList = new ArrayList<>();
+        List<Taskbeside> taskbesideList = new ArrayList<>();
+        List<Notification> notificationList = new ArrayList<>();
+        List<Category> mcategoryList = new ArrayList<>();
+        List<Mission> missionList = new ArrayList<>();
         switch (loader.getId()) {
             case EXISTING_MISIONS_LOADER:
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
-                missionList = new ArrayList<>();
                 if (data.moveToFirst()) {
                     do {
                         @SuppressLint("Range") String isSticker = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_isSTICKER));
@@ -1924,10 +2245,9 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                         @SuppressLint("Range") String time = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TIME));
                         @SuppressLint("Range") String title = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TITLE));
                         @SuppressLint("Range") String repeatNo = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REPEAT_NO));
-                        @SuppressLint("Range") String reminder = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER));
                         @SuppressLint("Range") String reminderType = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE));
                         @SuppressLint("Range") String isActive = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_isACTIVE));
-                        Mission mission = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminder, reminderType, isSticker, isActive);
+                        Mission mission = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminderType, isSticker, isActive);
                         missionList.add(mission);
                     } while (data.moveToNext());
                 }
@@ -1936,7 +2256,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
-                mcategoryList = new ArrayList<>();
                 while (data.moveToNext()) {
                     int id = data.getInt(data.getColumnIndexOrThrow(ToDoDBContract.CategoryEntry.CATEGORY_USER_ID));
                     String title = data.getString(data.getColumnIndexOrThrow(ToDoDBContract.CategoryEntry.CATEGORY_TITLE));
@@ -1948,7 +2267,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
-                stickerList = new ArrayList<>();
                 while (data.moveToNext()) {
                     int id = data.getInt(data.getColumnIndexOrThrow(ToDoDBContract.StickerEntry.STICKER_ID));
                     String title = data.getString(data.getColumnIndexOrThrow(ToDoDBContract.StickerEntry.STICKER_TITLE));
@@ -1960,7 +2278,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
-                ringtoneList = new ArrayList<>();
                 while (data.moveToNext()) {
                     int id = data.getInt(data.getColumnIndexOrThrow(ToDoDBContract.RingtoneEntry.RINGTONE_ID));
                     String title = data.getString(data.getColumnIndexOrThrow(ToDoDBContract.RingtoneEntry.RINGTONE_TITLE));
@@ -1972,7 +2289,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
-                taskbesideList = new ArrayList<>();
                 while (data.moveToNext()) {
                     int id = data.getInt(data.getColumnIndexOrThrow(ToDoDBContract.TaskbesideEntry.TASKBESIDE_ID));
                     String title = data.getString(data.getColumnIndexOrThrow(ToDoDBContract.TaskbesideEntry.TASKBESIDE_TITLE));
@@ -1984,7 +2300,6 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
-                notificationList = new ArrayList<>();
                 while (data.moveToNext()) {
                     int id = data.getInt(data.getColumnIndexOrThrow(ToDoDBContract.NotificationEntry.NOTIFICATION_ID));
                     String time = data.getString(data.getColumnIndexOrThrow(ToDoDBContract.NotificationEntry.NOTIFICATION_TIME));
@@ -1996,52 +2311,57 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             default:
                 return;
         }
-//        if (mcategoryList != null && !mcategoryList.isEmpty()) {
-//            mcategoryList = mcategoryList.stream().filter(category -> category.getUser_id() == user).collect(Collectors.toList());
-//        } else {
-//            mcategoryList = new ArrayList<>();
-//            shareDataDialogs.setDataCategory(-1);
-//        }
-//        shareDataDialogs.setCategoryList(mcategoryList);
-//        if (missionList != null) {
-//            List<Mission> mainList = new ArrayList<>();
-//            for (Category category : mcategoryList) {
-//                mainList.addAll(missionList.stream().filter(mission -> category.getCategory_id() == mission.getCategory_id()).collect(Collectors.toList()));
-//            }
-//            shareDataDialogs.setMainList(mainList);
-//            Log.e("checkcolumn2", "onLoadFinished: " + mainList.size());
-//        } else {
-//            List<Mission> mainList = new ArrayList<>();
-//            shareDataDialogs.setMainList(mainList);
-//        }
-//        if (stickerList != null) {
-//            shareDataDialogs.setStickerList(stickerList);
-//            Log.e("checkcolumn3", "onLoadFinished: " + stickerList.size());
-//        }else{
-//            stickerList = new ArrayList<>();
-//            shareDataDialogs.setStickerList(stickerList);
-//        }
-//        if (ringtoneList != null) {
-//            shareDataDialogs.setRingtoneList(ringtoneList);
-//            Log.e("checkcolumn4", "onLoadFinished: " + ringtoneList.size());
-//        }else {
-//            ringtoneList = new ArrayList<>();
-//            shareDataDialogs.setRingtoneList(ringtoneList);
-//        }
-//        if (taskbesideList != null) {
-//            shareDataDialogs.setTaskbesideList(taskbesideList);
-//            Log.e("checkcolumn5", "onLoadFinished: " + taskbesideList.size());
-//        }else{
-//            taskbesideList = new ArrayList<>();
-//            shareDataDialogs.setTaskbesideList(taskbesideList);
-//        }
-//        if (notificationList != null) {
-//            shareDataDialogs.setNotificationList(notificationList);
-//            Log.e("checkcolumn6", "onLoadFinished: " + notificationList.size());
-//        }else {
-//            notificationList = new ArrayList<>();
-//            shareDataDialogs.setNotificationList(notificationList);
-//        }
+        if (!mcategoryList.isEmpty()) {
+            mcategoryList = mcategoryList.stream().filter(category -> category.getUser_id() == user).collect(Collectors.toList());
+            shareDataDialogs.setCategoryList(mcategoryList);
+            Log.e("mcategoryList1", "onLoadFinished: " + mcategoryList.size());
+        }
+        shareDataDialogs.setDataCategory(category_id_1);
+        if (!missionList.isEmpty()) {
+            Toast.makeText(getContext(), "data2" + missionList.size(), Toast.LENGTH_SHORT).show();
+            List<Mission> mainList = new ArrayList<>();
+            if (shareDataDialogs.getCategoryList().getValue() == null){
+                shareDataDialogs.setCategoryList(new ArrayList<>());
+                shareDataDialogs.setMainList(mainList);
+            }else{
+                for (Category category : shareDataDialogs.getCategoryList().getValue()) {
+                    Log.e("loop1", "category: " + category.getCategory_id());
+                    for (Mission mission : missionList) {
+                        Log.e("loop1", "mission: " + mission.getCategory_id());
+                        if (category.getCategory_id() == mission.getCategory_id()) {
+                            mainList.add(mission);
+                        }
+                    }
+                }
+                Log.e("checkcolumn2", "onLoadFinished: " + mainList.size() + " " + mcategoryList.size());
+                shareDataDialogs.setMainList(mainList);
+                Log.e("mainlist", "onLoadFinished: " + shareDataDialogs.getMainList().getValue().size());
+            }
+        }
+        if (!stickerList.isEmpty()) {
+            shareDataDialogs.setStickerList(stickerList);
+            Log.e("checkcolumn3", "onLoadFinished: " + stickerList.size());
+        }else{
+            shareDataDialogs.setStickerList(new ArrayList<>());
+        }
+        if (!ringtoneList.isEmpty()) {
+            shareDataDialogs.setRingtoneList(ringtoneList);
+            Log.e("checkcolumn4", "onLoadFinished: " + ringtoneList.size());
+        }else {
+            shareDataDialogs.setRingtoneList(new ArrayList<>());
+        }
+        if (!taskbesideList.isEmpty()) {
+            shareDataDialogs.setTaskbesideList(taskbesideList);
+            Log.e("checkcolumn5", "onLoadFinished: " + taskbesideList.size());
+        }else{
+            shareDataDialogs.setTaskbesideList(new ArrayList<>());
+        }
+        if (!notificationList.isEmpty()) {
+            shareDataDialogs.setNotificationList(notificationList);
+            Log.e("checkcolumn6", "onLoadFinished: " + notificationList.size());
+        }else {
+            shareDataDialogs.setNotificationList(new ArrayList<>());
+        }
     }
 
     @Override
@@ -2051,13 +2371,8 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onItemClick(int position, int id, boolean isChosing, int selectionItem) {
-        if (isChosing) {
-            shareDataDialogs.setDataCategory(id);
-            itemCategoryAdapter.setSelectionItem(position);
-        }else{
-            missionAdapter.setFilterType("category_id");
-            missionAdapter.getFilter().filter(String.valueOf(id));
-        }
+        Toast.makeText(getContext(), "pos: " + position + "id:" + id, Toast.LENGTH_SHORT).show();
+        shareDataDialogs.setDataCategory(id);
     }
 
     @Override
@@ -2071,8 +2386,15 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
-    public void onItemClick(int position) {
-
+    public void onItemClick(int position, String name) {
+        Toast.makeText(getContext(), "name: " + position, Toast.LENGTH_SHORT).show();
+        List<TaskString> taskStringList = shareDataDialogs.getDatataskBesideList().getValue();
+        if (taskStringList == null){
+            Toast.makeText(getContext(), "null", Toast.LENGTH_SHORT).show();
+            taskStringList = new ArrayList<>();
+        }
+        taskStringList.remove(position);
+        shareDataDialogs.setDatataskBesideList(taskStringList);
     }
 
     @Override
@@ -2092,11 +2414,10 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
             alert.setTitle("Bạn có chắc chắn muốn xóa");
             alert.setCanceledOnTouchOutside(true);
             alert.setButton(AlertDialog.BUTTON_POSITIVE, "Có", (dialog, which) -> {
-                dialog.dismiss();
-                String s = mainList.get(position).getTitle();
-                Mission mission = mainList.get(position);
-                //remove item
+                Mission mission = Objects.requireNonNull(shareDataDialogs.getMainList().getValue()).get(position);
+                String s = mission.getTitle();
                 missionAdapter.removeItem(position);
+                dialog.dismiss();
                 Snackbar snackbar = Snackbar.make(relativeLayout, s + "remove", Snackbar.LENGTH_LONG);
                 snackbar.setAction("Undo", view -> {
                     //restore item
@@ -2106,7 +2427,7 @@ public class MissionFragment extends Fragment implements LoaderManager.LoaderCal
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         super.onDismissed(transientBottomBar, event);
-                        DAO.deleteMission(getContext(), mission.getMission_id());
+                        DAO.deleteMission(getContext(), mission.getMission_id(), currentUser);
                     }
                 });
                 snackbar.setActionTextColor(Color.YELLOW);

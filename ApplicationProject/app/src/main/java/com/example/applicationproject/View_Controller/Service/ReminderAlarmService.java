@@ -53,10 +53,11 @@ public class ReminderAlarmService extends IntentService implements TextToSpeech.
     private Mission mainList;
     private List<Ringtone> ringtoneList;
 
-    public static PendingIntent getReminderPendingIntent(Context context, int uri, int idNotify) {
+    public static PendingIntent getReminderPendingIntent(Context context, int mission_id, int idNotify, String name) {
         Intent action = new Intent(context, ReminderAlarmService.class);
-        action.putExtra("id_mission", uri);
+        action.putExtra("id_mission", mission_id);
         action.putExtra("idNotify", idNotify);
+        action.putExtra("name", name);
         return PendingIntent.getService(context, idNotify, action, PendingIntent.FLAG_IMMUTABLE);
     }
 
@@ -83,6 +84,9 @@ public class ReminderAlarmService extends IntentService implements TextToSpeech.
             }
             cursor.close();
         }
+        if (ringtoneList == null) {
+            ringtoneList = new ArrayList<>();
+        }
     }
 
     private void getMainList(Mission mainList, int id) {
@@ -102,10 +106,9 @@ public class ReminderAlarmService extends IntentService implements TextToSpeech.
                 @SuppressLint("Range") String time = cursor.getString(cursor.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TIME));
                 @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TITLE));
                 @SuppressLint("Range") String repeatNo = cursor.getString(cursor.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REPEAT_NO));
-                @SuppressLint("Range") String reminder = cursor.getString(cursor.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER));
                 @SuppressLint("Range") String reminderType = cursor.getString(cursor.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE));
                 @SuppressLint("Range") String isActive = cursor.getString(cursor.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_isACTIVE));
-                mainList = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminder, reminderType, isSticker, isActive);
+                mainList = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminderType, isSticker, isActive);
             }
             cursor.close();
         }
@@ -124,12 +127,12 @@ public class ReminderAlarmService extends IntentService implements TextToSpeech.
 
         // Xử lý thông tin về nhiệm vụ
         List<Mission> missionList = new ArrayList<>();
-        missionList.add(new Mission(1, 1, "29/12/2025", "Complete the project report", "true", "true", "daily", 1, "19:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missionList.add(new Mission(1, 1, "28/11/2025", "Complete the project report", "true", "true", "daily", 2, "10:00", "Morning meeting", 1, "5", "10 minutes before", "time", "true", "true"));
-        missionList.add(new Mission(1, 1, "27/10/2025", "Complete the project report", "true", "true", "daily", 3, "11:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missionList.add(new Mission(1, 1, "26/09/2025", "Complete the project report", "true", "true", "daily", 4, "02:00", "Morning meeting", 2, "5", "10 minutes before", "time", "true", "true"));
-        missionList.add(new Mission(1, 1, "25/07/2025", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
-        missionList.add(new Mission(1, 1, "28/06/2025", "Complete the project report", "true", "true", "daily", 6, "13:00", "Morning meeting", 3, "5", "10 minutes before", "time", "true", "true"));
+        missionList.add(new Mission(1, 1, "29/12/2025", "Complete the project report", "true", "true", "daily", 1, "19:00", "Morning meeting", 1, "5", "10 minutes before", "true", "on"));
+        missionList.add(new Mission(1, 1, "28/11/2025", "Complete the project report", "true", "true", "daily", 2, "10:00", "Morning meeting", 1, "5", "10 minutes before", "true", "on"));
+        missionList.add(new Mission(1, 1, "27/10/2025", "Complete the project report", "true", "true", "daily", 3, "11:00", "Morning meeting", 2, "5", "10 minutes before", "true", "on"));
+        missionList.add(new Mission(1, 1, "26/09/2025", "Complete the project report", "true", "true", "daily", 4, "02:00", "Morning meeting", 2, "5", "10 minutes before", "true", "on"));
+        missionList.add(new Mission(1, 1, "25/07/2025", "Complete the project report", "true", "true", "daily", 5, "09:00", "Morning meeting", 3, "5", "10 minutes before", "true", "on"));
+        missionList.add(new Mission(1, 1, "28/06/2025", "Complete the project report", "true", "true", "daily", 6, "13:00", "Morning meeting", 3, "5", "10 minutes before", "true", "on"));
 
         String description = missionList.stream()
                 .filter(v -> v.getMission_id() == uri)

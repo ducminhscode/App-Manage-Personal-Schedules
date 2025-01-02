@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -54,41 +55,27 @@ public class ItemCategoryAdapter extends RecyclerView.Adapter<ItemCategoryAdapte
     @Override
     public void onBindViewHolder(@NonNull ItemCategoryAdapter.ItemCategoryViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Category category = categoryList.get(position);
-        if (isChosing) {
-            if(position == selectionItem){
-                holder.layoutItemCate.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.primary));
-                holder.itemCategory.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
-            }else{
-                holder.layoutItemCate.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.caption5));
-                holder.itemCategory.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.gray));
-            }
+        if (position == 0 && selectionItem == -1){
+            selectionItem = position;
+        }
+        if(position == selectionItem){
+            holder.layoutItemCate.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.primary));
+            holder.itemCategory.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
         }else{
-            if (position == 0 && selectionItem == -1){
-                selectionItem = position;
-            }
-            if(position == selectionItem){
-                holder.layoutItemCate.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.primary));
-                holder.itemCategory.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
-            }else{
-                holder.layoutItemCate.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.caption5));
-                holder.itemCategory.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.gray));
-            }
+            holder.layoutItemCate.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.caption5));
+            holder.itemCategory.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.gray));
         }
         holder.itemCategory.setText(category.getCategory_name());
         holder.layoutItemCate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onItemListener.onItemClick(position, category.getCategory_id(), isChosing, selectionItem);
-                if (isChosing) {
-
-                }else{
-                    if(selectionItem != position) {
-                        int oldPosition = selectionItem;
-                        selectionItem = position;
-                        notifyItemChanged(position);
-                        if (oldPosition != -1) {
-                            notifyItemChanged(oldPosition);
-                        }
+                if(selectionItem != position) {
+                    int oldPosition = selectionItem;
+                    selectionItem = position;
+                    notifyItemChanged(position);
+                    if (oldPosition != -1) {
+                        notifyItemChanged(oldPosition);
                     }
                 }
             }
@@ -103,6 +90,7 @@ public class ItemCategoryAdapter extends RecyclerView.Adapter<ItemCategoryAdapte
 
     public void setChosingbyId(int id){
         this.selectionItem = categoryList.indexOf(categoryList.stream().filter(category -> category.getCategory_id() == id).findFirst().orElse(categoryList.get(0)));
+        notifyItemChanged(selectionItem);
     }
 
     @Override

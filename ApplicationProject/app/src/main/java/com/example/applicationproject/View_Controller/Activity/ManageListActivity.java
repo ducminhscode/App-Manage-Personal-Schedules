@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -67,6 +68,8 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manage_list);
         initWiget();
+        categoryList = new ArrayList<>();
+        missionList1 = new ArrayList<>();
         shareDataDialogs = new ViewModelProvider(this).get(ShareDataMission.class);
         getSupportLoaderManager().initLoader(EXISTING_CATEGORIES_LOADER, null, this);
         getSupportLoaderManager().initLoader(EXISTING_MISIONS_LOADER, null, this);
@@ -100,6 +103,7 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
         manageListAdapter = new ManageListAdapter(this, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(manageListAdapter);
+        manageListAdapter.getUsername(username);
     }
 
     private void initWiget() {
@@ -109,7 +113,12 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
             action(null, -1, -1);
         });
         imageButton = findViewById(R.id.btn_back);
-        imageButton.setOnClickListener(v -> finish());
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -117,12 +126,12 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
         if (DAO.getUserId(this.getBaseContext(), username) == -1){
             Toast.makeText(this.getBaseContext(), "Không có user", Toast.LENGTH_SHORT).show();
         }else{
-            if (DAO.checkCategory(this.getBaseContext(), resultData)){
+            if (DAO.checkCategory(this.getBaseContext(), resultData, DAO.getUserId(this.getBaseContext(), username))){
                 Toast.makeText(this.getBaseContext(), "Danh mục đã tồn tại", Toast.LENGTH_SHORT).show();
             }else{
                 if (DAO.insertCategory(this.getBaseContext(), resultData, user)){
                     Toast.makeText(this.getBaseContext(), "Insert Successfull", Toast.LENGTH_SHORT).show();
-                    int id = DAO.getCategoryId(this.getBaseContext(), resultData);
+                    int id = DAO.getCategoryId(this.getBaseContext(), resultData, user);
                     Log.e("add", "addToList: " + id );
                     categoryList.add(new Category(id, resultData, DAO.getUserId(this.getBaseContext(), username)));
                     manageListAdapter.notifyDataSetChanged();
@@ -225,7 +234,6 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
                     ToDoDBContract.MissionEntry.MISSION_isREPEAT,
                     ToDoDBContract.MissionEntry.MISSION_REPEAT_TYPE,
                     ToDoDBContract.MissionEntry.MISSION_REPEAT_NO,
-                    ToDoDBContract.MissionEntry.MISSION_REMINDER,
                     ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE,
                     ToDoDBContract.MissionEntry.MISSION_RINGTONE_ID,
                     ToDoDBContract.MissionEntry.MISSION_DESCRIPTION,
@@ -243,13 +251,14 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        List<Category> mcategoryList = null;
-        List<Mission> missionList = null;
+        List<Category> mcategoryList = new ArrayList<>();
+        List<Mission> missionList = new ArrayList<>();
         switch (loader.getId()) {
             case EXISTING_MISIONS_LOADER:
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
+                Log.e("misionList", "onLoadFinished: " + data.getCount());
                 missionList = new ArrayList<>();
                 if (data.moveToFirst()) {
                     do {
@@ -266,10 +275,9 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
                         @SuppressLint("Range") String time = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TIME));
                         @SuppressLint("Range") String title = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_TITLE));
                         @SuppressLint("Range") String repeatNo = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REPEAT_NO));
-                        @SuppressLint("Range") String reminder = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER));
                         @SuppressLint("Range") String reminderType = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_REMINDER_TYPE));
                         @SuppressLint("Range") String isActive = data.getString(data.getColumnIndex(ToDoDBContract.MissionEntry.MISSION_isACTIVE));
-                        Mission mission = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminder, reminderType, isSticker, isActive);
+                        Mission mission = new Mission(sticker_id, ringTone_id, date, describe, isNotify, isRepeat, repeatType, mission_id, time, title, category_id, repeatNo, reminderType, isSticker, isActive);
                         missionList.add(mission);
                     } while (data.moveToNext());
                 }
@@ -278,6 +286,7 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
                 if (data == null || data.getCount() < 1) {
                     return;
                 }
+                Toast.makeText(this, "data1" + data.getCount(), Toast.LENGTH_SHORT).show();
                 mcategoryList = new ArrayList<>();
                 while (data.moveToNext()) {
                     int id = data.getInt(data.getColumnIndexOrThrow(ToDoDBContract.CategoryEntry.CATEGORY_ID));
@@ -287,22 +296,24 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
                 }
                 break;
         }
-        if (mcategoryList != null) {
+        if (!mcategoryList.isEmpty()) {
             mcategoryList = mcategoryList.stream().filter(category -> category.getUser_id() == user).collect(Collectors.toList());
-//            Log.e("checkcolumn1", "onLoadFinished: categoyList" + mcategoryList.get(0).getCategory_name());
-        } else {
-            mcategoryList = new ArrayList<>();
+            categoryList = mcategoryList;
         }
-        categoryList = mcategoryList;
-        if (missionList != null) {
-            List<Mission> mainList = new ArrayList<>();
-            for (Category category : mcategoryList) {
-                mainList.addAll(missionList.stream().filter(mission -> category.getCategory_id() == mission.getCategory_id()).collect(Collectors.toList()));
+        Log.e("checkcolumn", "onLoadFinished: " + categoryList.size() + missionList.size());
+        //Log.e("checkcolumn", "onLoadFinished: " + missionList.get(0).getCategory_id());
+        if (!missionList.isEmpty()) {
+            Toast.makeText(this, "data2" + missionList.size(), Toast.LENGTH_SHORT).show();
+            for (Category category : categoryList) {
+                Log.e("loop1", "category: " + category.getCategory_id());
+                for (Mission mission : missionList) {
+                    Log.e("loop1", "mission: " + mission.getCategory_id());
+                    if (category.getCategory_id() == mission.getCategory_id()) {
+                        missionList1.add(mission);
+                    }
+                }
             }
-            missionList1 = mainList;
-            Log.e("checkcolumn2", "onLoadFinished: " + mainList.size());
-        } else {
-            missionList1 = new ArrayList<>();
+            Log.e("checkcolumn2", "onLoadFinished: " + missionList1.size() + " " + categoryList.size());
         }
         manageListAdapter.setUpdate(categoryList, missionList1);
     }
@@ -320,5 +331,12 @@ public class ManageListActivity extends AppCompatActivity implements ManageListA
 //            shareDataDialogs.setMainList(missionList);
 //            manageListAdapter.notifyDataSetChanged();
 //        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        getSupportLoaderManager().destroyLoader(EXISTING_CATEGORIES_LOADER);
+        getSupportLoaderManager().destroyLoader(EXISTING_MISIONS_LOADER);
     }
 }

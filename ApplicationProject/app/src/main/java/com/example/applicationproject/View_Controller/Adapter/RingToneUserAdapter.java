@@ -33,13 +33,17 @@ public class RingToneUserAdapter extends RecyclerView.Adapter<RingToneUserAdapte
     private final Context context;
     private MediaPlayer mediaPlayer;
 
-    @SuppressLint("NotifyDataSetChanged")
-    public RingToneUserAdapter(Context context, List<Ringtone> ringtoneList, OnClickItemRingtone onItemListener) {
-        this.ringtoneList = ringtoneList;
+    public RingToneUserAdapter(Context context, OnClickItemRingtone onItemListener) {
         this.onItemListener = onItemListener;
         this.context = context;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setRingtoneList(List<Ringtone> ringtoneList) {
+        this.ringtoneList = ringtoneList;
         notifyDataSetChanged();
     }
+
 
     @NonNull
     @Override
@@ -184,7 +188,7 @@ public class RingToneUserAdapter extends RecyclerView.Adapter<RingToneUserAdapte
 
     @Override
     public int getItemCount() {
-        if (ringtoneList.isEmpty()) {
+        if (ringtoneList == null) {
             return 0;
         }else{
             return ringtoneList.size();

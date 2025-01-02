@@ -10,21 +10,17 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 
     <item
-        android:id="@+id/filter"
-        android:title="Lọc"
-        android:icon="@drawable/baseline_filter_list_alt_24"
-        android:iconTint="@color/black"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="android.widget.LinearLayout"
-        />
-
-    <item
         android:id="@+id/theLoai"
         android:title="Manage Category"
-        android:icon="@drawable/setting"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/about"
-        android:title="About"
+    <item
+        android:id="@+id/history"
+        android:title="History"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/thongke"
+        android:title="Statistical"
+        app:showAsAction="never" />
 </menu>

@@ -32,7 +32,7 @@ import java.util.List;
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> implements Filterable {
 
     private List<User> userlist;
-    private OnClickItemUser onItemListener;
+    private final OnClickItemUser onItemListener;
     private final Context context;
     private List<User> mlistUserOld;
 
@@ -111,7 +111,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialogInterface, i) -> {
                     userlist.remove(position);
                     notifyItemRemoved(position);
-                    DAO.deleteUser(context, user.getUser_id());
+                    DAO.deleteUser(context, user.getUser_id(), user.getUser_name());
                     Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show();
                     dialogInterface.dismiss();
                 });
@@ -133,12 +133,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
-        private ImageButton imageButton_edit;
-        private ImageButton imageButton_delete;
-        private ImageView imageView_user, userImage;
-        private TextView textView_name;
-        private TextView textView_email;
-        private TextView textView_phone;
+        private final ImageButton imageButton_edit;
+        private final ImageButton imageButton_delete;
+        private final ImageView imageView_user;
+        private final TextView textView_name;
+        private final TextView textView_email;
+        private final TextView textView_phone;
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             imageButton_edit = itemView.findViewById(R.id.btn_edit);
@@ -147,7 +147,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             textView_name = itemView.findViewById(R.id.user_name);
             textView_email = itemView.findViewById(R.id.user_email);
             textView_phone = itemView.findViewById(R.id.user_phone);
-            userImage = itemView.findViewById(R.id.userImage);
         }
     }
 

@@ -62,7 +62,6 @@ public final class ToDoDBContract {
         public static final String MISSION_REPEAT_TYPE = "repeat_type";
         public static final String MISSION_DESCRIPTION = "description";
         public static final String MISSION_isNOTIFY = "isNotify";
-        public static final String MISSION_REMINDER = "reminder";
         public static final String MISSION_REMINDER_TYPE = "reminder_type";
         public static final String MISSION_CATEGORY_ID = "category_id";
         public static final String MISSION_RINGTONE_ID = "ringtone_id";

@@ -113,7 +113,7 @@ public class MissionGuestFragment extends Fragment {
         if (item.getItemId() == R.id.theLoai) {
             Toast.makeText(requireContext(), "Thể Loại", Toast.LENGTH_SHORT).show();
             return true;
-        } else if (item.getItemId() == R.id.about) {
+        } else if (item.getItemId() == R.id.thongke) {
             Toast.makeText(requireContext(), "About", Toast.LENGTH_SHORT).show();
             return true;
         }

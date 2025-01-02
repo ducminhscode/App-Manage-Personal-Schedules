@@ -122,19 +122,24 @@ public class OTPVerification extends AppCompatActivity {
                 } else {
                     if (generateOtp.length() == 6) {
                         if (generateOtp.equals(isOTP)) {
-
-                            ToDoDBHelper credb = new ToDoDBHelper(OTPVerification.this);
                             DAO.addUser(getBaseContext(), getName, getEmail, getMobile, getPassword,checkUser());
                             int userID = DAO.getUserId(getBaseContext(), getName);
-                            boolean check = DAO.insertCategory(getBaseContext(), "Không thể loại", userID);
+                            boolean check = DAO.insertCategory(getBaseContext(), "Không có thể loại", userID);
                             if (check) {
                                 Toast.makeText(OTPVerification.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
                             }else{
                                 Toast.makeText(OTPVerification.this, "Đăng ký thất bại", Toast.LENGTH_SHORT).show();
+                                return;
                             }
                             isOTP = null;
                             atp = 0;
-
+                            int category_id = DAO.getCategoryId(getBaseContext(), "Không có thể loại", userID);
+                            if (category_id == -1){
+                                Toast.makeText(OTPVerification.this, "Không có thể loại", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            Intent intent = new Intent(OTPVerification.this, Login.class);
+                            intent.putExtra("category_id", category_id);
                             startActivity(new Intent(OTPVerification.this, Login.class));
                         } else {
                             enterWrongOTPCode();

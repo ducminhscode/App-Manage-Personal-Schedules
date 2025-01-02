@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -47,6 +48,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,7 +60,6 @@ public class CalendarFragment extends Fragment {
 //    private static final Log log = LogFactory.getLog(CalendarFragment.class);
     private LocalTime localTime;
     private LocalDate localDate;
-    private List<Mission> mainList;
     private CalendarView calendarView;
     private boolean isCalendarVisible = true;
     private MenuItem visibleItem;
@@ -67,6 +68,7 @@ public class CalendarFragment extends Fragment {
     private MissionAdapter calendarAdapter;
     private TextView emptyViewItem;
     private ShareDataMission shareDataMission;
+    private String selectedDate;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -119,42 +121,50 @@ public class CalendarFragment extends Fragment {
         layoutCalendar = view.findViewById(R.id.layoutCalendar);
         emptyViewItem = view.findViewById(R.id.emptyViewItem);
 
-        shareDataMission = new ViewModelProvider(this).get(ShareDataMission.class);
+        shareDataMission = MissionFragment.shareDataDialogs;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             localDate = LocalDate.now();
             localTime = LocalTime.now();
         }
-
         shareDataMission.setDataOrdering(2);
-        shareDataMission.setDataChangeLanguage(2);
-
-        MissionFragment missionFragment = new MissionFragment();
         calendarAdapter = new MissionAdapter(requireContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false);
         rVC.setLayoutManager(linearLayoutManager);
-        mainList = new ArrayList<>();
+
         shareDataMission.getMainList().observe(getViewLifecycleOwner(), missons -> {
             if (missons != null) {
-                mainList.clear();
-                mainList.addAll(missons);
+                calendarAdapter.setMissionList(missons);
+                rVC.setVisibility(View.VISIBLE);
+                emptyViewItem.setVisibility(View.GONE);
             } else {
-                mainList.clear();
+                calendarAdapter.setMissionList(new ArrayList<>());
+                rVC.setVisibility(View.GONE);
+                emptyViewItem.setVisibility(View.VISIBLE);
             }
-            calendarAdapter.setMissionList(mainList);
         });
         rVC.setAdapter(calendarAdapter);
 
         setHasOptionsMenu(true);
 
-        checkEmptyData();
-
         calendarView = view.findViewById(R.id.calendarViewCalendar);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
-
+                Toast.makeText(getContext(), "onclick", Toast.LENGTH_SHORT).show();
                 //Xử lý sự kiện lọc danh sách khi chọn các ngày trong lịch
-                String selectedDate = i2 + "-" + (i1 + 1) + "-" + i;
+                String day;
+                String month;
+                if (i2 < 10){
+                    day = "0" + i2;
+                }else{
+                    day = String.valueOf(i2);
+                }
+                if (i1 + 1 < 10){
+                    month = "0" + (i1 + 1);
+                }else{
+                    month = String.valueOf(i1 + 1);
+                }
+                selectedDate = day + "/" + month + "/" + i;
                 calendarAdapter.setFilterType("DateTime");
                 calendarAdapter.getFilter().filter(selectedDate);
             }
@@ -163,16 +173,6 @@ public class CalendarFragment extends Fragment {
         return view;
     }
 
-    //Kiểm tra dữ liệu có rỗng
-    private void checkEmptyData() {
-        if (calendarAdapter.getItemCount() == 0) {
-            rVC.setVisibility(View.GONE);
-            emptyViewItem.setVisibility(View.VISIBLE);
-        } else {
-            rVC.setVisibility(View.VISIBLE);
-            emptyViewItem.setVisibility(View.GONE);
-        }
-    }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -314,16 +314,17 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-        if (mainList == null) {
-            mainList = new ArrayList<>();
-        }else{
-            mainList = new ArrayList<>();
-        }
 
         radioGroup.setOnCheckedChangeListener((radioGroup1, i) -> {
+            if (selectedDate.isEmpty()){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    selectedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                }
+            }
             if (i == radioButton1.getId()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    mainList.sort((mission, t1) -> {
+                    List<Mission> missionList = shareDataMission.getMainList().getValue().stream().collect(Collectors.toList());
+                    missionList.sort((mission, t1) -> {
                         String date1 = mission.getDate();
                         String date2 = t1.getDate();
                         String time1 = mission.getTime();
@@ -347,19 +348,38 @@ public class CalendarFragment extends Fragment {
                         }
                         return 1;
                     });
+                    shareDataMission.setMainList(missionList);
+                    calendarAdapter.setFilterType("DateTime");
+                    calendarAdapter.getFilter().filter(selectedDate);
                 }
                 shareDataMission.setDataOrdering(1);
             }else if (i == radioButton2.getId()){
-                mainList.sort(Comparator.comparing(Mission::getMission_id));
+                List<Mission> missionList = shareDataMission.getMainList().getValue().stream().collect(Collectors.toList());
+                missionList.sort(Comparator.comparing(Mission::getMission_id));
+                shareDataMission.setMainList(missionList);
+                calendarAdapter.setFilterType("DateTime");
+                calendarAdapter.getFilter().filter(selectedDate);
                 shareDataMission.setDataOrdering(2);
             }else if (i == radioButton3.getId()){
-                mainList.sort(Comparator.comparing(Mission::getMission_id).reversed());
+                List<Mission> missionList = shareDataMission.getMainList().getValue().stream().collect(Collectors.toList());
+                missionList.sort(Comparator.comparing(Mission::getMission_id).reversed());
+                shareDataMission.setMainList(missionList);
+                calendarAdapter.setFilterType("DateTime");
+                calendarAdapter.getFilter().filter(selectedDate);
                 shareDataMission.setDataOrdering(3);
             }else if (i == radioButton4.getId()){
-                mainList.sort(Comparator.comparing(Mission::getTitle));
+                List<Mission> missionList = shareDataMission.getMainList().getValue().stream().collect(Collectors.toList());
+                missionList.sort(Comparator.comparing(Mission::getTitle));
+                shareDataMission.setMainList(missionList);
+                calendarAdapter.setFilterType("DateTime");
+                calendarAdapter.getFilter().filter(selectedDate);
                 shareDataMission.setDataOrdering(4);
             }else if (i == radioButton5.getId()){
-                mainList.sort(Comparator.comparing(Mission::getTitle).reversed());
+                List<Mission> missionList = shareDataMission.getMainList().getValue().stream().collect(Collectors.toList());
+                missionList.sort(Comparator.comparing(Mission::getTitle).reversed());
+                shareDataMission.setMainList(missionList);
+                calendarAdapter.setFilterType("DateTime");
+                calendarAdapter.getFilter().filter(selectedDate);
                 shareDataMission.setDataOrdering(5);
             }
             dialog.dismiss();

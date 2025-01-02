@@ -23,11 +23,11 @@ public class AlarmScheduler {
     private static final Map<Integer, PendingIntent> pendingIntentMap = new HashMap<>();
 
     @SuppressLint("ScheduleExactAlarm")
-    public void setAlarm(Context context, long alarmTime, int reminderTask, int idNotify) {
+    public void setAlarm(Context context, long alarmTime, int reminderTask, int idNotify, String name) {
         AlarmManager manager = AlarmManagerProvider.getAlarmManager(context);
 
         PendingIntent operation =
-                ReminderAlarmService.getReminderPendingIntent(context, reminderTask, idNotify);
+                ReminderAlarmService.getReminderPendingIntent(context, reminderTask, idNotify, name);
 
 
         pendingIntentMap.put(idNotify, operation);
@@ -36,11 +36,11 @@ public class AlarmScheduler {
 
     }
 
-    public void setRepeatAlarm(Context context, long alarmTime, int reminderTask, long RepeatTime, int idNotify) {
+    public void setRepeatAlarm(Context context, long alarmTime, int reminderTask, long RepeatTime, int idNotify, String name) {
         AlarmManager manager = AlarmManagerProvider.getAlarmManager(context);
 
         PendingIntent operation =
-                ReminderAlarmService.getReminderPendingIntent(context, reminderTask, idNotify);
+                ReminderAlarmService.getReminderPendingIntent(context, reminderTask, idNotify, name);
 
         pendingIntentMap.put( idNotify, operation);
 
@@ -49,11 +49,11 @@ public class AlarmScheduler {
 
     }
 
-    public void cancelAlarm(Context context, int reminderTask, int idNotify) {
+    public void cancelAlarm(Context context, int reminderTask, int idNotify, String name) {
         AlarmManager manager = AlarmManagerProvider.getAlarmManager(context);
 
         PendingIntent operation =
-                ReminderAlarmService.getReminderPendingIntent(context, reminderTask, idNotify);
+                ReminderAlarmService.getReminderPendingIntent(context, reminderTask, idNotify, name);
 
         if (operation != null) {
             // Hủy bỏ báo thức

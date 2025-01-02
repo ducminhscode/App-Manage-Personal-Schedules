@@ -302,11 +302,11 @@ public class DAO {
     }
 
 
-    public static void deleteUser(Context context, int id) {
+    public static void deleteUser(Context context, int id, String name) {
         Uri newUri = Uri.withAppendedPath(ToDoDBContract.BASE_CONTENT_URI, ToDoDBContract.PATH_USERS);
         String selection = ToDoDBContract.UserEntry.USER_ID + " = ?";
         String[] selectionArgs = { String.valueOf(id) };
-        deleteALLCategory(context, id);
+        deleteALLCategory(context, id, name);
         // Thực hiện xóa người dùng
         int rowsDeleted = context.getContentResolver().delete(newUri, selection, selectionArgs);
 
@@ -343,7 +343,7 @@ public class DAO {
     public static boolean insertMission(Context context, int sticker_id, int ringTone_id, String date,
                                         String describe, String isNotify, String isRepeat, String repeatType,
                                         String time, String title, int category_id,
-                                        String repeatNo, String reminder, String reminderType,
+                                        String repeatNo, String reminderType,
                                         String isSticker, String isActive) {
 
         // Tạo đối tượng ContentValues để chứa dữ liệu cần chèn
@@ -356,7 +356,6 @@ public class DAO {
         values.put(ToDoDBContract.MissionEntry.MISSION_REPEAT_NO, repeatNo);
         values.put(ToDoDBContract.MissionEntry.MISSION_REPEAT_TYPE, repeatType);
         values.put(ToDoDBContract.MissionEntry.MISSION_isNOTIFY, isNotify);
-        values.put(ToDoDBContract.MissionEntry.MISSION_REMINDER, reminder);
         values.put(ToDoDBContract.MissionEntry.MISSION_CATEGORY_ID, category_id);
         values.put(ToDoDBContract.MissionEntry.MISSION_RINGTONE_ID, ringTone_id);
         values.put(ToDoDBContract.MissionEntry.MISSION_STICKER_ID, sticker_id);
@@ -601,7 +600,7 @@ public class DAO {
     public static boolean updateMission(Context context, int sticker_id, int ringTone_id, String date,
                                         String describe, String isNotify, String isRepeat, String repeatType,
                                         String time, String title, int category_id,
-                                        String repeatNo, String reminder, String reminderType,
+                                        String repeatNo, String reminderType,
                                         String isSticker, String isActive, int id) {
 
         // Tạo đối tượng ContentValues để lưu trữ giá trị cần cập nhật
@@ -614,7 +613,6 @@ public class DAO {
         values.put(ToDoDBContract.MissionEntry.MISSION_REPEAT_NO, repeatNo);
         values.put(ToDoDBContract.MissionEntry.MISSION_REPEAT_TYPE, repeatType);
         values.put(ToDoDBContract.MissionEntry.MISSION_isNOTIFY, isNotify);
-        values.put(ToDoDBContract.MissionEntry.MISSION_REMINDER, reminder);
         values.put(ToDoDBContract.MissionEntry.MISSION_CATEGORY_ID, category_id);
         values.put(ToDoDBContract.MissionEntry.MISSION_RINGTONE_ID, ringTone_id);
         values.put(ToDoDBContract.MissionEntry.MISSION_STICKER_ID, sticker_id);
@@ -672,10 +670,10 @@ public class DAO {
         return row > 0;
     }
 
-    public static int getCategoryId(Context context, String category_title){
+    public static int getCategoryId(Context context, String category_title, int category_user_id){
         Uri newUri = Uri.withAppendedPath(ToDoDBContract.BASE_CONTENT_URI, ToDoDBContract.PATH_CATEGORIES);
-        String selection = ToDoDBContract.CategoryEntry.CATEGORY_TITLE + " = ? ";
-        String[] selectionArgs = { category_title };
+        String selection = ToDoDBContract.CategoryEntry.CATEGORY_TITLE + " = ? AND " + ToDoDBContract.CategoryEntry.CATEGORY_USER_ID + " = ? ";
+        String[] selectionArgs = { category_title, String.valueOf(category_user_id)};
         Cursor cursor = context.getContentResolver().query(newUri, null, selection, selectionArgs, null);
         if (cursor != null && cursor.moveToFirst()) {
             int id = cursor.getInt(cursor.getColumnIndexOrThrow(ToDoDBContract.CategoryEntry.CATEGORY_ID));
@@ -686,8 +684,8 @@ public class DAO {
         }
     }
 
-    public static boolean checkCategory(Context context, String category_title){
-        return getCategoryId(context, category_title) != -1;
+    public static boolean checkCategory(Context context, String category_title, int category_user_id){
+        return getCategoryId(context, category_title, category_user_id) != -1;
     }
 
 
@@ -724,27 +722,27 @@ public class DAO {
 //        return true;
 //    }
 
-    public static boolean deleteMission(Context context, int id){
+    public static boolean deleteMission(Context context, int id, String name){
         Uri newUri = Uri.withAppendedPath(ToDoDBContract.BASE_CONTENT_URI, ToDoDBContract.PATH_MISSIONS);
         String selection = ToDoDBContract.MissionEntry.MISSION_ID + " = ? ";
         String[] selectionArgs = { String.valueOf(id) };
 
         // Xóa tất cả taskbeside và notification liên quan đến mission trước khi xóa mission
         deleteALLTaskbeside(context, id);
-        deleteALLNotification(context, id);
+        deleteALLNotification(context, id, name);
 
         // Xóa mission chính
         int row = context.getContentResolver().delete(newUri, selection, selectionArgs);
         return row > 0;
     }
 
-    public static boolean deleteCategory(Context context, int id){
+    public static boolean deleteCategory(Context context, int id, String name){
         Uri newUri = Uri.withAppendedPath(ToDoDBContract.BASE_CONTENT_URI, ToDoDBContract.PATH_CATEGORIES);
         String selection = ToDoDBContract.CategoryEntry.CATEGORY_ID + " = ? ";
         String[] selectionArgs = { String.valueOf(id) };
 
         // Xóa tất cả mission liên quan đến category trước khi xóa category
-        deleteALLMission(context, id);
+        deleteALLMission(context, id, name);
 
         // Xóa category chính
         int row = context.getContentResolver().delete(newUri, selection, selectionArgs);
@@ -790,12 +788,12 @@ public class DAO {
         return context.getContentResolver().query(newUri, null, selection, selectionArgs, null);
     }
 
-    public static void deleteALLCategory(Context context, int userId){
+    public static void deleteALLCategory(Context context, int userId, String name){
         try (Cursor cursor = getCursorCategory(context, userId)) {
             if (cursor != null && cursor.moveToFirst()) {
                 while (cursor.moveToNext()) {
                     int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow(ToDoDBContract.CategoryEntry.CATEGORY_ID));
-                    deleteCategory(context, categoryId);
+                    deleteCategory(context, categoryId, name);
                 }
             }
         }catch (Exception e){
@@ -811,12 +809,12 @@ public class DAO {
         return context.getContentResolver().query(newUri, null, selection, selectionArgs, null);
     }
 
-    public static void deleteALLMission(Context context, int categoryId){
+    public static void deleteALLMission(Context context, int categoryId, String name){
         try (Cursor cursor = getCursorMission(context, categoryId)) {
             if (cursor != null && cursor.moveToFirst()) {
                 while (cursor.moveToNext()) {
                     int missionId = cursor.getInt(cursor.getColumnIndexOrThrow(ToDoDBContract.MissionEntry.MISSION_ID));
-                    deleteMission(context, missionId);
+                    deleteMission(context, missionId, name);
                 }
             }
         }catch (Exception e){
@@ -863,13 +861,13 @@ public class DAO {
         return context.getContentResolver().query(newUri, null, selection, selectionArgs, null);
     }
 
-    public static void deleteALLNotification(Context context, int missionId) {
+    public static void deleteALLNotification(Context context, int missionId, String name) {
         try (Cursor cursor = getCursorNotification(context, missionId)) {
             if (cursor != null && cursor.moveToFirst()) {
                 while (cursor.moveToNext()) {
                     int notificationId = cursor.getInt(cursor.getColumnIndexOrThrow(ToDoDBContract.NotificationEntry.NOTIFICATION_ID));
                     deleteNotification(context, notificationId);
-                    new AlarmScheduler().cancelAlarm(context, missionId, notificationId);
+                    new AlarmScheduler().cancelAlarm(context, missionId, notificationId, name);
                 }
             }
         }catch (Exception e){

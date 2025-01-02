@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:gravity="center_vertical">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -16,13 +17,20 @@
             android:layout_height="30dp"
             android:background="@drawable/back"/>
 
+        <TextView
+            android:layout_marginStart="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="History"/>
 
         <ImageButton
             android:id="@+id/btnDelete"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/baseline_delete_24"
-            android:layout_marginStart="330dp"
+            android:layout_marginStart="250dp"
             android:backgroundTint="@color/primary"
             />
 

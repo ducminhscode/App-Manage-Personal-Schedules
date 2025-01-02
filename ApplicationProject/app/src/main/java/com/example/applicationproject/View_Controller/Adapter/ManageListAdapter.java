@@ -43,6 +43,7 @@ public class ManageListAdapter extends RecyclerView.Adapter<ManageListAdapter.Ma
     private final Context context;
     private List<Mission> missionList;
     private int userId;
+    private String username;
 
     @SuppressLint("NotifyDataSetChanged")
     public ManageListAdapter(Context context, OnClickItemCategoryMore onItemListener) {
@@ -67,6 +68,9 @@ public class ManageListAdapter extends RecyclerView.Adapter<ManageListAdapter.Ma
     @Override
     public void onBindViewHolder(@NonNull ManageListViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Category categoryCustom = categoryList.get(position);
+        if (position == 0){
+            holder.managelist_item_more.setVisibility(View.GONE);
+        }
         holder.managelist_item.setText(categoryCustom.getCategory_name());
         holder.managelist_item_count.setText(String.valueOf(getEvents(categoryCustom.getCategory_id()).size()));
         holder.managelist_item_more.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +97,7 @@ public class ManageListAdapter extends RecyclerView.Adapter<ManageListAdapter.Ma
                             Button btn_save = dialog.findViewById(R.id.btn_save);
                             editText_managelist.setText(categoryCustom.getCategory_name());
                             btn_save.setOnClickListener(view -> {
-                                if (DAO.checkCategory(context, editText_managelist.getText().toString())){
+                                if (DAO.checkCategory(context, editText_managelist.getText().toString(), userId)){
                                     Toast.makeText(context, "Danh mục đã tồn tại", Toast.LENGTH_SHORT).show();
                                 }else{
                                     if (DAO.updateCategory(context, categoryCustom.getCategory_id(), editText_managelist.getText().toString(), userId)){
@@ -119,10 +123,10 @@ public class ManageListAdapter extends RecyclerView.Adapter<ManageListAdapter.Ma
                         builder.setMessage("Bạn có muốn xóa danh mục " + categoryCustom.getCategory_name() + " không?");
                         builder.setPositiveButton("Yes", (di, which) -> {
                             Log.e("onclick", "onClick: " + position + " " + categoryCustom.getCategory_id());
-                            if (DAO.deleteCategory(context, categoryCustom.getCategory_id())){
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, getItemCount());
+                            if (DAO.deleteCategory(context, categoryCustom.getCategory_id(), username)){
                                 Toast.makeText(context, "Delete Successfull", Toast.LENGTH_SHORT).show();
-                                notifyItemRemoved(position);
-                                notifyItemRangeChanged(position, getItemCount());
                             }else{
                                 Toast.makeText(context, "Fail", Toast.LENGTH_SHORT).show();
                             };
@@ -171,4 +175,9 @@ public class ManageListAdapter extends RecyclerView.Adapter<ManageListAdapter.Ma
     public interface OnClickItemCategoryMore {
         void onItemClick(int position, String categoryName, int id);
     }
+
+    public void getUsername(String username){
+        this.username = username;
+    }
+
 }

@@ -75,6 +75,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginStart="10dp"
+                    android:visibility="gone"
                     android:src="@drawable/relax" />
 
                 <TextView
@@ -82,7 +83,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_toEndOf="@+id/type"
+                    android:layout_marginStart="50dp"
                     android:text="Nhớ uống nước"
                     android:textSize="24sp" />
 

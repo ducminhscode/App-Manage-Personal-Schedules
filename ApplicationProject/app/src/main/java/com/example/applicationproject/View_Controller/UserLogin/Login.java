@@ -46,6 +46,7 @@ public class Login extends AppCompatActivity {
     protected GoogleSignInClient mGoogleSignInClient;
     protected static final int RC_SIGN_IN = 10;
 
+    private int category_id;
     private TextView txtWrong;
 
     @Override
@@ -139,7 +140,7 @@ public class Login extends AppCompatActivity {
         signInBtnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Toast.makeText(Login.this, "check", Toast.LENGTH_SHORT).show();
                 String txtUserNameET = userNameET.getText().toString();
                 String txtPasswordET = passwordET.getText().toString();
 
@@ -168,16 +169,14 @@ public class Login extends AppCompatActivity {
 
                     Toast.makeText(Login.this, "Sign in successfully", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(Login.this, ScreenMainLogin.class);
-
+                    intent.putExtra("category_id", category_id);
                     intent.putExtra("name", getNameTxt);
                     intent.putExtra("password", getPasswordTxt);
 
                     txtWrong.setVisibility(View.GONE);
                     rememberUser(txtUserNameET, txtPasswordET, remember);
                     startActivity(intent);
-                    Intent intent1 = new Intent();
-                    intent1.putExtra("CurrentUser", txtUserNameET);
-                    startActivity(intent1);
+
                 }
             }
         });
@@ -185,7 +184,7 @@ public class Login extends AppCompatActivity {
         signInWithGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Toast.makeText(Login.this, "check", Toast.LENGTH_SHORT).show();
                 signInWithGG();
             }
         });
@@ -226,9 +225,7 @@ public class Login extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-
                 String personName = account.getDisplayName();
                 Log.e("GoogleSignIn", "onActivityResult:0 " + personName);
                 String personEmail = account.getEmail();
@@ -241,11 +238,13 @@ public class Login extends AppCompatActivity {
                         Log.e("userid", "onActivityResult: "  + personName + personEmail + "admin");
                         int userID = DAO.getUserId(this, personName);
                         DAO.insertCategory(this, "Không có thể loại", userID);
+                        category_id = DAO.getCategoryId(this, "Không có thể loại", userID);
                     } else {
                         DAO.addUser(this,personName, personEmail, null, null, "user");
                         Log.e("userid", "onActivityResult: "  + personName + personEmail + "user");
                         int userID = DAO.getUserId(this, personName);
                         DAO.insertCategory(this, "Không có thể loại", userID);
+                        category_id = DAO.getCategoryId(this, "Không có thể loại", userID);
                     }
 
                 }else{
@@ -264,9 +263,9 @@ public class Login extends AppCompatActivity {
                 SharedPreferences getNameLogin = getSharedPreferences("USER_NAME", MODE_PRIVATE);
                 @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = getNameLogin.edit().putString("USERNAME", getNameTxt);
                 editor.apply();
-
+                category_id = DAO.getCategoryId(this, "Không có thể loại", userID);
                 Intent intent = new Intent(Login.this, ScreenMainLogin.class);
-
+                intent.putExtra("category_id", category_id);
                 intent.putExtra("name", getNameTxt);
 
                 startActivity(intent);
