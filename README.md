@@ -35,7 +35,6 @@ Người dùng có thể tạo lịch trình, đặt nhắc nhở bằng âm tha
 - **Ngôn ngữ**: Java / Kotlin  
 - **Cơ sở dữ liệu**:  
   - [SQLite](https://developer.android.com/training/data-storage/sqlite) (cục bộ trên máy)  
-  - Có thể mở rộng dùng [Firebase Firestore](https://firebase.google.com/docs/firestore) để đồng bộ trên nhiều thiết bị  
 - **Authentication**: [Firebase Authentication](https://firebase.google.com/docs/auth) (Google Sign-In)  
 - **Notification**: Android AlarmManager / WorkManager  
 
