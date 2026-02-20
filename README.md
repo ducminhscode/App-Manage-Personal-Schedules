@@ -53,3 +53,9 @@ Người dùng có thể tạo lịch trình, đặt nhắc nhở bằng âm tha
 1. Clone project:  
    ```bash
    git clone https://github.com/your-repo/schedule-manager-app.git
+
+   
+## 📺 YouTube Demo
+
+https://youtu.be/WmixygnXNzM?si=Ua_5coP9L16Jc2lQ
+
